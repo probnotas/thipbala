@@ -26,8 +26,27 @@ tools/README-tracking.md       how the tracking works
 Run it from a local server (the frames are fetched, so `file://` will not work):
 
 ```bash
-python3 -m http.server 8080
+./tools/serve.sh          # or: python3 -m http.server 8080
 ```
+
+## Deploying
+
+It is a static site with no build step — point any host at the repo root.
+
+`vercel.json` sets the cache headers, which matter more here than on a
+typical site: one visit pulls hundreds of frames. Frames and artwork get 30
+days with `stale-while-revalidate`; CSS/JS always revalidate so a push is
+visible immediately. The frames are cached hard but deliberately **not**
+`immutable` — their filenames are stable, so an immutable header would pin
+a stale intro for anyone who had visited before a `build-frames.sh` rerun.
+
+`.vercelignore` keeps `media/`, `tools/` and this README out of the deploy:
+the clip is only an input to the frame build, never played at runtime.
+Deployed payload is ~64MB, essentially all frame sequence.
+
+On Vercel, import the repo at vercel.com/new and deploy with framework
+preset **Other** and no build command. Pushes to `main` then redeploy on
+their own.
 
 ## The loading screen
 

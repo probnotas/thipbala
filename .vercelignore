@@ -1,0 +1,7 @@
+# The source clip is only an input to tools/build-frames.sh. The site plays
+# the generated frame sequence, never this file — no reason to ship 7MB of it.
+media/
+
+# Tooling and docs are not part of the deployed site.
+tools/
+README.md
