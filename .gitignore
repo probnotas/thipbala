@@ -1,0 +1,8 @@
+# The source clip lives at media/approach.mp4; this is the original upload
+# under its export name, kept locally but not worth a second copy in git.
+magichour_image_to_video-*.mp4
+
+# Scratch
+_*.html
+.DS_Store
+*.log

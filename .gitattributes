@@ -1,0 +1,4 @@
+# Frame sequences and artwork are binary; never try to diff or merge them.
+*.jpg binary
+*.webp binary
+*.mp4 binary

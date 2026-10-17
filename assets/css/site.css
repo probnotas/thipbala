@@ -1,0 +1,522 @@
+/* =====================================================================
+   Star Chart Portfolio — homepage
+   Tokens follow the design spec §6. One gold accent, nothing else warm.
+   ===================================================================== */
+
+:root{
+  --bg:#050505;
+  --star:#F2F2F0;
+  --star-dim:rgba(242,242,240,.35);
+  --rule:rgba(242,242,240,.28);
+  --accent:#E8B84B;
+  --accent-glow:rgba(232,184,75,.55);
+  --card-bg:#0C0C0C;
+  --card-line:rgba(255,255,255,.08);
+  /* Fraunces with its SOFT axis dialled up — titles only. WONK 0 keeps the
+     quirky alternates off. Everything else (body, links, metadata) runs in
+     a plain system sans, which also costs no extra webfont request. */
+  --display:"Fraunces",Georgia,serif;
+  --meta:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+         Helvetica,Arial,"Helvetica Neue",sans-serif;
+  --soft:"SOFT" 100,"WONK" 0;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+/* The UA stylesheet's [hidden] rule is only `display:none` at the lowest
+   specificity, so any author `display` (the card's flex .meta, its
+   inline-block link) silently defeats it. fill() hides empty card blocks
+   with .hidden, so this has to actually win. */
+[hidden]{display:none!important}
+html{background:var(--bg)}
+body{
+  margin:0;background:var(--bg);color:var(--star);
+  font-family:var(--meta);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* =====================================================================
+   ACT 1 — the approach. A tall scroll track with a sticky canvas; the
+   frame sequence is scrubbed from scroll progress across that track.
+   ===================================================================== */
+
+#approach{position:relative;height:var(--track,520vh)}
+#approach .sticky{
+  position:sticky;top:0;height:100svh;overflow:hidden;
+  transform:translate3d(var(--jx,0px),var(--jy,0px),0);
+}
+#frames{
+  display:block;width:100%;height:100%;
+  background:var(--bg);
+}
+
+/* =====================================================================
+   Loading screen — the first thing anyone sees. Just the greeting on
+   black while the opening frames arrive; it holds for a beat even on a
+   fast connection so it reads as an intro rather than a flash.
+   ===================================================================== */
+#loader{
+  /* fixed, and a sibling of .sticky rather than a child, so the pointer
+     drift never moves it — the loading screen stays dead still. */
+  position:fixed;inset:0;z-index:20;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(22px,4vh,40px);
+  background:var(--bg);
+  transition:opacity .8s ease;
+  padding:0 24px;
+}
+#loader.gone{opacity:0;pointer-events:none}
+#loader h1{
+  margin:0;
+  font-family:var(--display);
+  font-variation-settings:var(--soft);
+  font-weight:400;
+  font-size:clamp(34px,7.5vw,96px);
+  line-height:1.05;
+  letter-spacing:-.015em;
+  color:var(--star);
+  text-align:center;
+}
+/* Each word arrives on its own beat. */
+#loader h1 span{
+  display:inline-block;
+  opacity:0;
+  animation:wordIn .62s cubic-bezier(.22,.61,.36,1) forwards;
+}
+#loader h1 span:nth-child(1){animation-delay:.10s}
+#loader h1 span:nth-child(2){animation-delay:.38s}
+#loader h1 span:nth-child(3){animation-delay:.66s}
+@keyframes wordIn{
+  from{opacity:0;transform:translateY(.34em)}
+  to  {opacity:1;transform:none}
+}
+
+/* Progress toward being able to start — see dismissLoader() in main.js. */
+#loader .bar{
+  width:min(160px,38vw);height:2px;
+  background:rgba(242,242,240,.13);
+  position:relative;overflow:hidden;
+  opacity:0;
+  animation:fadeIn .5s ease .95s forwards;
+}
+#loader .bar i{
+  position:absolute;inset:0 auto 0 0;width:0%;
+  background:var(--accent);
+  transition:width .3s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fadeIn{to{opacity:1}}
+
+@media (prefers-reduced-motion:reduce){
+  #loader h1 span{animation:none;opacity:1}
+  #loader .bar{animation:none;opacity:1}
+  #loader .bar i{transition:none}
+}
+
+/* =====================================================================
+   Grain — over the loading screen and the clip, gone by the time the
+   star chart is readable (opacity is driven from scroll in main.js, so
+   it lifts as the chart dissolves in). The chart is line art on black
+   and grain only muddies it.
+   ===================================================================== */
+#grain{
+  /* Deliberately NOT drifted with --jx/--jy: grain belongs to the lens, not
+     to the scene, so it stays locked to the screen while everything under
+     it moves. Sliding it would read as a texture sheet, not as film grain. */
+  position:fixed;inset:0;z-index:25;
+  pointer-events:none;
+  opacity:var(--grain,.5);
+
+  /* Opaque, high-contrast grayscale noise.
+     Two things matter here and both were wrong before:
+     1. feTurbulence writes noise into the ALPHA channel as well as RGB, so
+        the raw filter output is mostly transparent — measured alpha topped
+        out at 99/255. The feColorMatrix pipes the red channel into R/G/B
+        and forces alpha to 1, making it fully opaque.
+     2. The gamma transfer pushes the midtones down, which keeps the mean
+        low (so blacks are not hazed out) while widening the spread. At
+        exponent 6 the composite over #050505 measures sd 15 against the
+        old sd 2.2 — the old version was invisible, not subtle.
+     filterUnits/primitiveUnits are userSpaceOnUse so no '%' appears in the
+     data URI, where it would be read as an escape sequence. */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' filterUnits='userSpaceOnUse' x='0' y='0' width='180' height='180'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='gamma' exponent='6'/%3E%3CfeFuncG type='gamma' exponent='6'/%3E%3CfeFuncB type='gamma' exponent='6'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-repeat:repeat;
+
+  /* screen, not overlay: overlay multiplies into a near-black backdrop and
+     the grain would vanish exactly where this scene spends most of itself. */
+  mix-blend-mode:screen;
+
+  /* Jitter via background-position, NOT transform. A transform animation
+     needs its own compositing layer, and promoting this element can drop
+     mix-blend-mode against the backdrop entirely in some engines. */
+  animation:grainShift .7s steps(1) infinite;
+}
+@keyframes grainShift{
+  0%  {background-position:0 0}
+  20% {background-position:-47px 31px}
+  40% {background-position:29px -53px}
+  60% {background-position:-61px -23px}
+  80% {background-position:43px 17px}
+}
+@media (prefers-reduced-motion:reduce){
+  #grain{animation:none}
+}
+
+/* =====================================================================
+   Greeting — anchored to the cockpit window opening and scaled with it.
+   Position and font-size are written from JS each frame (see main.js);
+   font-size rather than transform:scale so the type stays crisp as it
+   grows past 5x. The dark halo keeps it legible where the opening's
+   struts catch the light.
+   ===================================================================== */
+#greeting{
+  position:absolute;z-index:12;
+  margin:0;
+  transform:translate(-50%,-50%);
+  transform-origin:center;
+  font-family:var(--display);
+  font-variation-settings:var(--soft);
+  font-weight:400;
+  font-size:100px;                 /* measured once, then overwritten */
+  line-height:1;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  color:var(--star);
+  text-shadow:0 0 .28em rgba(0,0,0,.85),0 0 .9em rgba(0,0,0,.6);
+  opacity:0;
+  pointer-events:none;
+  will-change:left,top,font-size;
+}
+
+/* The window-anchored greeting is parked (SHOW_GREETING in main.js) and
+   reduced motion skips the approach entirely. Either way it is fully
+   removed — the loading screen's h1 already carries the same words, and
+   two copies would be read out twice. */
+#greeting.off{display:none}
+
+/* scroll cue — fades out once the approach is underway */
+#cue{
+  position:absolute;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));
+  transform:translateX(-50%);z-index:15;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-size:10.5px;letter-spacing:.22em;color:var(--star-dim);
+  transition:opacity .4s ease;pointer-events:none;
+}
+#cue .line{
+  width:1px;height:26px;
+  background:linear-gradient(to bottom,var(--star-dim),transparent);
+  animation:drift 2.2s ease-in-out infinite;
+}
+@keyframes drift{
+  0%,100%{opacity:.25;transform:translateY(-3px)}
+  50%    {opacity:.9; transform:translateY(3px)}
+}
+
+/* =====================================================================
+   ACT 2 — the chart. Fixed behind the scroll track, dissolved in at the
+   end of the approach so it lands on the sequence's final frame.
+   ===================================================================== */
+
+#chart-stage{
+  position:fixed;inset:0;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  /* Opaque: at full opacity this must completely cover the canvas, or the
+     clip's final frame (which is itself a chart) doubles every element. */
+  background:var(--bg);
+  opacity:0;visibility:hidden;
+  transform:translate3d(var(--jx,0px),var(--jy,0px),0);
+}
+/* Opacity here is written inline from scroll position, so it must NOT be
+   transitioned — a time-based ease would smear against the scrub. */
+#chart-stage.on{visibility:visible}
+/* Only takes pointer events once the approach has fully handed over. */
+#chart-stage.live{pointer-events:auto}
+#chart-stage:not(.live){pointer-events:none}
+
+/* Width/height are written from JS to match the clip's final frame
+   (see main.js). flex:none so the container cannot shrink that match;
+   the percentages are only the pre-load fallback. */
+svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulation}
+
+/* ---- chart primitives ---- */
+.rule{stroke:var(--rule);fill:none}
+.tick{stroke:var(--rule);stroke-width:1}
+.tick.major{stroke:rgba(242,242,240,.5)}
+.axis{stroke:var(--star-dim);stroke-width:.75;stroke-dasharray:5 6;fill:none}
+.ecliptic{stroke:var(--star-dim);stroke-width:.9;stroke-dasharray:7 7;fill:none}
+.netline{stroke:rgba(242,242,240,.085);stroke-width:.4;fill:none}
+.constline{stroke:rgba(242,242,240,.30);stroke-width:.55;fill:none}
+.fieldstar,.catstar{fill:var(--star)}
+
+/* ---- nodes ---- */
+.node{cursor:pointer;outline:none}
+.node .halo{fill:var(--accent-glow);opacity:0;filter:url(#soften)}
+.node .ring{fill:none;stroke:var(--star);stroke-width:1}
+.node .core{fill:var(--star)}
+.node .hit{fill:transparent}
+.node .ring,.node .core,.node .halo,.node .grp{transition:all .18s ease}
+.node .grp{transform-box:fill-box;transform-origin:center}
+
+.node.visited .halo{opacity:.3}
+.node.visited .ring{stroke:var(--accent);fill:none}
+.node.visited .core{fill:var(--accent)}
+
+.node:hover .halo,.node:focus-visible .halo,.node.open .halo{opacity:.85}
+.node:hover .ring,.node:focus-visible .ring,.node.open .ring{stroke:var(--accent)}
+.node:hover .core,.node:focus-visible .core,.node.open .core{fill:var(--accent)}
+.node:hover .grp,.node:focus-visible .grp,.node.open .grp{transform:scale(1.3)}
+.node:focus-visible .ring{stroke-dasharray:2 2}
+
+/* ---- card ---- */
+#card{
+  position:fixed;width:296px;z-index:40;
+  /* place() in star-chart.js subtracts the drift before writing left/top,
+     because it measures the already-drifted chart — without that the
+     offset would be applied twice and the card would slide off its node. */
+  transform:translate3d(var(--jx,0px),var(--jy,0px),0);
+  background:var(--card-bg);
+  border:1px solid var(--card-line);
+  box-shadow:0 18px 50px rgba(0,0,0,.85);
+  padding:0 0 14px;
+  opacity:0;visibility:hidden;
+  transition:opacity .16s ease;
+  /* Real entries run to four bullets, so the tallest card is ~550px. The
+     vertical clamp in place() cannot help once a card is taller than the
+     window, so cap it and let the content scroll instead of clipping. */
+  max-height:calc(100vh - 32px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+#card.on{opacity:1;visibility:visible}
+#card .thumb{
+  width:100%;aspect-ratio:16/9;display:block;
+  background:
+    repeating-linear-gradient(135deg,rgba(242,242,240,.05) 0 8px,transparent 8px 16px),
+    #101010;
+  border-bottom:1px solid var(--card-line);
+}
+#card .thumb.has-img{background-size:cover;background-position:center}
+#card .pad{padding:12px 14px 0}
+#card h2{
+  font-family:var(--display);font-variation-settings:var(--soft);font-weight:400;
+  font-size:21px;line-height:1.15;letter-spacing:0;margin:0 0 6px;
+}
+#card .desc{font-size:13px;line-height:1.45;color:rgba(242,242,240,.78);margin:0 0 9px}
+#card .meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:10px}
+#card .pill{
+  font-size:10.5px;letter-spacing:.06em;
+  border:1px solid var(--card-line);padding:2px 6px;color:rgba(242,242,240,.65);
+}
+#card .yr{font-size:11px;color:var(--star-dim);margin-left:auto;font-variant-numeric:tabular-nums}
+#card ul{margin:0 0 12px;padding-left:15px}
+#card li{font-size:12.5px;line-height:1.5;color:rgba(242,242,240,.72);margin-bottom:3px}
+#card .more{
+  display:inline-block;font-size:12px;letter-spacing:.07em;
+  font-family:var(--meta);
+  color:var(--accent);text-decoration:none;cursor:pointer;
+  background:none;border:0;padding:1px 0 2px;
+  border-bottom:1px solid rgba(232,184,75,.4);
+}
+#card .more:hover{border-bottom-color:var(--accent)}
+#card .more::after{content:" \2192";opacity:.7}
+#card .sid{
+  position:absolute;top:10px;right:12px;
+  font-family:var(--meta);font-size:11px;
+  color:rgba(242,242,240,.4);letter-spacing:.1em;
+}
+
+/* =====================================================================
+   Story modal — the full write-up behind a card's "Read more".
+   Sits above everything, including the grain, and is the one surface
+   that scrolls on its own.
+   ===================================================================== */
+#story{
+  position:fixed;inset:0;z-index:60;
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(12px,4vh,48px) clamp(12px,4vw,40px);
+}
+#story.closing{pointer-events:none}
+.story-scrim{
+  position:absolute;inset:0;
+  background:rgba(3,3,3,.82);
+  backdrop-filter:blur(3px);
+  opacity:0;transition:opacity .28s ease;
+}
+#story.on .story-scrim{opacity:1}
+
+.story-panel{
+  position:relative;z-index:1;
+  width:min(720px,100%);max-height:100%;
+  display:flex;flex-direction:column;
+  background:var(--card-bg);
+  border:1px solid var(--card-line);
+  box-shadow:0 30px 90px rgba(0,0,0,.9);
+  overflow-y:auto;overscroll-behavior:contain;
+  opacity:0;transform:translateY(14px) scale(.985);
+  transition:opacity .28s ease,transform .28s cubic-bezier(.22,.61,.36,1);
+}
+#story.on .story-panel{opacity:1;transform:none}
+
+.story-close{
+  position:absolute;top:10px;right:12px;z-index:2;
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  font:300 24px/1 var(--meta);
+  color:var(--star);
+  background:rgba(8,8,8,.62);
+  border:1px solid var(--card-line);
+  border-radius:50%;
+  cursor:pointer;
+  transition:color .15s ease,border-color .15s ease;
+}
+.story-close:hover{color:var(--accent);border-color:rgba(232,184,75,.45)}
+
+.story-hero{
+  width:100%;aspect-ratio:16/9;flex:none;
+  background:#101010 center/cover no-repeat;
+  border-bottom:1px solid var(--card-line);
+}
+.story-hero.none{display:none}
+
+.story-body{padding:clamp(20px,3.4vw,34px)}
+.story-kicker{
+  margin:0 0 6px;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--star-dim);
+}
+.story-kicker:empty{display:none}
+#story h2{
+  margin:0 0 14px;
+  font-family:var(--display);font-variation-settings:var(--soft);
+  font-weight:400;font-size:clamp(28px,4.6vw,40px);
+  line-height:1.08;letter-spacing:-.01em;color:var(--star);
+}
+.story-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:22px}
+.story-meta .pill{
+  font-size:11px;letter-spacing:.06em;
+  border:1px solid var(--card-line);padding:3px 8px;color:rgba(242,242,240,.66);
+}
+.story-meta .yr{font-size:12px;color:var(--star-dim);margin-left:auto;font-variant-numeric:tabular-nums}
+
+.story-prose p{
+  margin:0 0 15px;
+  font-size:15px;line-height:1.68;
+  color:rgba(242,242,240,.80);
+}
+.story-prose p:last-child{margin-bottom:0}
+.story-prose ul{margin:0 0 15px;padding-left:20px}
+.story-prose li{
+  font-size:15px;line-height:1.68;
+  color:rgba(242,242,240,.80);
+  margin-bottom:8px;
+}
+.story-prose li::marker{color:var(--accent)}
+.story-prose a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(232,184,75,.4)}
+.story-prose a:hover{border-bottom-color:var(--accent)}
+
+.story-link{
+  display:inline-block;margin-top:22px;
+  font-size:13px;letter-spacing:.06em;
+  color:var(--accent);text-decoration:none;
+  border-bottom:1px solid rgba(232,184,75,.4);padding-bottom:2px;
+}
+.story-link:hover{border-bottom-color:var(--accent)}
+
+@media (prefers-reduced-motion:reduce){
+  .story-scrim,.story-panel{transition:none}
+  .story-panel{transform:none}
+}
+
+/* ---- footer + hint ---- */
+#footer{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  transform:translate3d(var(--jx,0px),var(--jy,0px),0);
+  display:flex;gap:18px;align-items:center;
+  padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));
+  font-size:11.5px;letter-spacing:.05em;
+  opacity:0;visibility:hidden;transition:opacity .45s ease;
+}
+#footer.on{opacity:1;visibility:visible}
+#footer a{color:var(--star-dim);text-decoration:none}
+#footer a:hover{color:var(--accent)}
+#footer .spacer{flex:1}
+
+#hint{
+  position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:20px;z-index:30;
+  transform:translate3d(var(--jx,0px),var(--jy,0px),0);
+  font-size:11.5px;letter-spacing:.05em;color:var(--star-dim);
+  opacity:0;visibility:hidden;transition:opacity .45s ease;
+}
+#hint.on{opacity:1;visibility:visible}
+
+body.framed #footer,body.framed #hint,body.framed #cue,
+body.framed #greeting{opacity:0;pointer-events:none}
+
+/* ---- chart load sequence ---- */
+.lyr{opacity:0;transition:opacity .7s ease}
+.lyr.in{opacity:1}
+
+/* =====================================================================
+   Reduced motion — spec §8. Drop the scroll scrub to a static final
+   frame and take the chart straight to its resting state.
+   ===================================================================== */
+@media (prefers-reduced-motion:reduce){
+  .lyr{transition:none}
+  .node .ring,.node .core,.node .halo,.node .grp{transition:none}
+  .node:hover .grp,.node:focus-visible .grp,.node.open .grp{transform:none}
+  #cue .line{animation:none}
+}
+
+/* =====================================================================
+   Narrow screens.
+
+   Letterboxing a 1200x640 chart into a 375px-wide phone renders it at
+   375x200 (scale 0.31), which puts the node hit targets at ~15px against
+   the 44px minimum in spec §3.2 — and the closest node pair is only 25px
+   apart there, so 44px targets cannot fit at that scale at all.
+
+   So on phones the chart fills the viewport HEIGHT instead and pans
+   horizontally. Nothing is cropped away permanently, the tick border is
+   still reachable, and hit targets land around 60px. It also matches the
+   handoff better: the canvas already draws the clip `cover`, so the
+   video's final frame is itself a centre crop on portrait.
+   ===================================================================== */
+@media (max-width:720px) and (orientation:portrait){
+  #chart-stage{
+    justify-content:flex-start;
+    overflow-x:auto;overflow-y:hidden;
+    scrollbar-width:none;
+    /* The pan is driven by pointer events in main.js, so the browser must
+       not also scroll or zoom on the same gesture. */
+    touch-action:none;
+    overscroll-behavior:contain;
+    cursor:grab;
+  }
+  #chart-stage:active{cursor:grabbing}
+  #chart-stage::-webkit-scrollbar{display:none}
+
+  /* Edge fades: shown only on the side the chart continues past, so the
+     chart reads as pannable without adding a label. */
+  #chart-stage::before,#chart-stage::after{
+    content:"";position:fixed;top:0;bottom:0;width:44px;
+    z-index:6;pointer-events:none;opacity:0;transition:opacity .25s ease;
+  }
+  #chart-stage::before{
+    left:0;background:linear-gradient(to right,var(--bg),transparent);
+  }
+  #chart-stage::after{
+    right:0;background:linear-gradient(to left,var(--bg),transparent);
+  }
+  #chart-stage.can-l::before{opacity:.9}
+  #chart-stage.can-r::after{opacity:.9}
+}
+
+/* ---- narrow: bottom sheet ---- */
+@media (max-width:720px){
+  #card{
+    left:0!important;right:0!important;bottom:0!important;top:auto!important;
+    width:100%;border-left:none;border-right:none;border-bottom:none;
+    padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));
+    max-height:72%;overflow-y:auto;
+  }
+  #card .thumb{aspect-ratio:21/9}
+  #footer{display:none}
+}
