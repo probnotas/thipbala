@@ -12,11 +12,13 @@ import math, os
 W, H = 320, 180
 OUT = os.path.join(os.path.dirname(__file__), "..", "assets", "img")
 
-BG     = "#0A0A0A"
-LINE   = "rgba(242,242,240,.55)"
-FAINT  = "rgba(242,242,240,.22)"
-DIM    = "rgba(242,242,240,.10)"
-ACCENT = "#E8B84B"
+# Matches the site tokens in assets/css/site.css (carried from thip-ins):
+# warm near-black ground, cream line work, orange accent.
+BG     = "#1a1610"
+LINE   = "rgba(243,236,220,.55)"
+FAINT  = "rgba(243,236,220,.22)"
+DIM    = "rgba(243,236,220,.10)"
+ACCENT = "#ff7a3d"
 
 
 def svg(body, title):
@@ -37,7 +39,7 @@ def stars(seed, n=34):
         a = (a * 1103515245 + 12345) & 0x7FFFFFFF
         r = 0.4 + ((a >> 7) % 100) / 140
         o = 0.12 + ((a >> 11) % 100) / 220
-        out.append(f'<circle cx="{x}" cy="{y}" r="{r:.2f}" fill="#F2F2F0" opacity="{o:.2f}"/>')
+        out.append(f'<circle cx="{x}" cy="{y}" r="{r:.2f}" fill="#f3ecdc" opacity="{o:.2f}"/>')
     return "".join(out)
 
 
@@ -113,7 +115,7 @@ art["liveeo"] = grid() + stars(5) + "".join(towers) + spans + (
 rings = "".join(f'<circle cx="160" cy="104" r="{r}" fill="none" stroke="{FAINT if i else LINE}" '
                 f'stroke-width="{1.2 if i == 0 else .7}" opacity="{1 - i*.17:.2f}"/>'
                 for i, r in enumerate((16, 34, 52, 70, 88)))
-people = "".join(f'<circle cx="{x}" cy="{y}" r="2.4" fill="#F2F2F0" opacity=".5"/>'
+people = "".join(f'<circle cx="{x}" cy="{y}" r="2.4" fill="#f3ecdc" opacity=".5"/>'
                  for x, y in ((64, 62), (96, 142), (232, 58), (256, 132), (44, 108), (276, 96),
                               (130, 36), (196, 166)))
 art["mammalian"] = grid() + stars(53) + rings + people + (

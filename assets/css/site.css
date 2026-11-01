@@ -3,22 +3,31 @@
    Tokens follow the design spec §6. One gold accent, nothing else warm.
    ===================================================================== */
 
+/* =====================================================================
+   Carried over from thip-ins: its type pairing, its warm palette and its
+   printed-sticker shadows. thip-ins is light by default with a dark
+   variant; a star chart has to be dark, so the dark variant is the one
+   used here — the same warm near-black, cream and orange rather than the
+   neutral grey and gold this started with.
+   ===================================================================== */
 :root{
-  --bg:#050505;
-  --star:#F2F2F0;
-  --star-dim:rgba(242,242,240,.35);
-  --rule:rgba(242,242,240,.28);
-  --accent:#E8B84B;
-  --accent-glow:rgba(232,184,75,.55);
-  --card-bg:#0C0C0C;
-  --card-line:rgba(255,255,255,.08);
-  /* Fraunces with its SOFT axis dialled up — titles only. WONK 0 keeps the
-     quirky alternates off. Everything else (body, links, metadata) runs in
-     a plain system sans, which also costs no extra webfont request. */
-  --display:"Fraunces",Georgia,serif;
-  --meta:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
-         Helvetica,Arial,"Helvetica Neue",sans-serif;
-  --soft:"SOFT" 100,"WONK" 0;
+  --bg:#16130f;                        /* thip-ins --bg, dark */
+  --star:#f3ecdc;                      /* --ink */
+  --star-dim:rgba(243,236,220,.42);    /* --muted, as a scrim */
+  --rule:rgba(243,236,220,.30);        /* --line */
+  --accent:#ff7a3d;                    /* --accent */
+  --accent-ink:#ff9a66;
+  --accent-glow:rgba(255,122,61,.55);
+  --card-bg:#211c15;                   /* --card */
+  --paper:#2a241b;                     /* --paper */
+  --card-line:rgba(243,236,220,.30);
+  --shadow:rgba(0,0,0,.6);
+
+  /* Figtree carries everything; Space Mono takes the technical register —
+     star ids, years, tick labels — which is what the chart wanted anyway. */
+  --display:Figtree,"Helvetica Neue",Arial,sans-serif;
+  --meta:Figtree,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Space Mono",ui-monospace,Menlo,Consolas,monospace;
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -31,6 +40,7 @@ html{background:var(--bg)}
 body{
   margin:0;background:var(--bg);color:var(--star);
   font-family:var(--meta);
+  line-height:1.5;
   -webkit-font-smoothing:antialiased;
   /* Everything renders lower case. Done in CSS rather than in the copy so
      the source text keeps its real capitalisation — remove this one line
@@ -49,6 +59,10 @@ body{
    inherited lowercase above — buttons would otherwise render as authored. */
 button,input,select,textarea{text-transform:inherit}
 
+/* The default focus ring is the browser's blue, which is the one colour
+   nothing else on the page uses. */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
 /* =====================================================================
    ACT 1 — the approach. A tall scroll track with a sticky canvas; the
    frame sequence is scrubbed from scroll progress across that track.
@@ -64,6 +78,20 @@ button,input,select,textarea{text-transform:inherit}
 #frames{
   display:block;width:100%;height:100%;
   background:var(--bg);
+}
+
+/* The clip was shot against a neutral near-black — measured (3,3,3) on its
+   final frame — while the site now sits on a warm (22,19,15). Cross-fading
+   between the two showed the ground lift and warm at the handoff.
+   `lighten` takes the per-channel max, so this sets the clip's black floor
+   to exactly the page background and leaves anything brighter (the cockpit
+   metal, the stars) untouched. Cheaper and far more tunable than
+   regrading 1,200 frames, and it moves with the palette automatically. */
+#floor{
+  position:absolute;inset:0;
+  background:var(--bg);
+  mix-blend-mode:lighten;
+  pointer-events:none;
 }
 
 /* =====================================================================
@@ -84,7 +112,7 @@ button,input,select,textarea{text-transform:inherit}
 /* Progress toward being able to start — see dismissLoader() in main.js. */
 #loader .bar{
   width:min(200px,46vw);height:2px;
-  background:rgba(242,242,240,.13);
+  background:rgba(243,236,220,.16);
   position:relative;overflow:hidden;
   opacity:0;
   animation:fadeIn .6s ease .15s forwards;
@@ -123,7 +151,7 @@ button,input,select,textarea{text-transform:inherit}
         and forces alpha to 1, making it fully opaque.
      2. The gamma transfer pushes the midtones down, which keeps the mean
         low (so blacks are not hazed out) while widening the spread. At
-        exponent 6 the composite over #050505 measures sd 15 against the
+        exponent 6 the composite over the page background measures sd 15 against the
         old sd 2.2 — the old version was invisible, not subtle.
      filterUnits/primitiveUnits are userSpaceOnUse so no '%' appears in the
      data URI, where it would be read as an escape sequence. */
@@ -179,11 +207,11 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
 /* ---- chart primitives ---- */
 .rule{stroke:var(--rule);fill:none}
 .tick{stroke:var(--rule);stroke-width:1}
-.tick.major{stroke:rgba(242,242,240,.5)}
+.tick.major{stroke:rgba(243,236,220,.5)}
 .axis{stroke:var(--star-dim);stroke-width:.75;stroke-dasharray:5 6;fill:none}
 .ecliptic{stroke:var(--star-dim);stroke-width:.9;stroke-dasharray:7 7;fill:none}
-.netline{stroke:rgba(242,242,240,.085);stroke-width:.4;fill:none}
-.constline{stroke:rgba(242,242,240,.30);stroke-width:.55;fill:none}
+.netline{stroke:rgba(243,236,220,.09);stroke-width:.4;fill:none}
+.constline{stroke:rgba(243,236,220,.32);stroke-width:.55;fill:none}
 .fieldstar,.catstar{fill:var(--star)}
 
 /* ---- nodes ---- */
@@ -214,7 +242,7 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
   transform:translate3d(var(--jx,0px),var(--jy,0px),0);
   background:var(--card-bg);
   border:1px solid var(--card-line);
-  box-shadow:0 18px 50px rgba(0,0,0,.85);
+  box-shadow:4px 6px 0 var(--shadow);
   padding:0 0 14px;
   opacity:0;visibility:hidden;
   transition:opacity .16s ease;
@@ -229,38 +257,41 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
 #card .thumb{
   width:100%;aspect-ratio:16/9;display:block;
   background:
-    repeating-linear-gradient(135deg,rgba(242,242,240,.05) 0 8px,transparent 8px 16px),
-    #101010;
-  border-bottom:1px solid var(--card-line);
+    repeating-linear-gradient(135deg,rgba(243,236,220,.06) 0 8px,transparent 8px 16px),
+    var(--paper);
+  border-bottom:1.5px solid var(--card-line);
 }
 #card .thumb.has-img{background-size:cover;background-position:center}
 #card .pad{padding:12px 14px 0}
 #card h2{
-  font-family:var(--display);font-variation-settings:var(--soft);font-weight:400;
-  font-size:21px;line-height:1.15;letter-spacing:0;margin:0 0 6px;
+  font-family:var(--display);font-weight:700;
+  font-size:21px;line-height:1.1;letter-spacing:-.03em;margin:0 0 6px;
 }
-#card .desc{font-size:13px;line-height:1.45;color:rgba(242,242,240,.78);margin:0 0 9px}
+#card .desc{font-size:13px;line-height:1.45;color:rgba(243,236,220,.80);margin:0 0 9px}
 #card .meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:10px}
 #card .pill{
-  font-size:10.5px;letter-spacing:.06em;
-  border:1px solid var(--card-line);padding:2px 6px;color:rgba(242,242,240,.65);
+  display:inline-flex;align-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0;
+  height:22px;padding:0 9px;border-radius:999px;
+  border:1.5px solid var(--card-line);background:var(--paper);
+  color:rgba(243,236,220,.82);
 }
-#card .yr{font-size:11px;color:var(--star-dim);margin-left:auto;font-variant-numeric:tabular-nums}
+#card .yr{font-family:var(--mono);font-size:11px;color:var(--star-dim);margin-left:auto}
 #card ul{margin:0 0 12px;padding-left:15px}
-#card li{font-size:12.5px;line-height:1.5;color:rgba(242,242,240,.72);margin-bottom:3px}
+#card li{font-size:12.5px;line-height:1.5;color:rgba(243,236,220,.76);margin-bottom:3px}
 #card .more{
-  display:inline-block;font-size:12px;letter-spacing:.07em;
-  font-family:var(--meta);
+  display:inline-block;font-size:11px;letter-spacing:0;
+  font-family:var(--mono);font-weight:700;
   color:var(--accent);text-decoration:none;cursor:pointer;
   background:none;border:0;padding:1px 0 2px;
-  border-bottom:1px solid rgba(232,184,75,.4);
+  border-bottom:1.5px solid rgba(255,122,61,.45);
 }
 #card .more:hover{border-bottom-color:var(--accent)}
 #card .more::after{content:" \2192";opacity:.7}
 #card .sid{
   position:absolute;top:10px;right:12px;
-  font-family:var(--meta);font-size:11px;
-  color:rgba(242,242,240,.4);letter-spacing:.1em;
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  color:rgba(243,236,220,.5);letter-spacing:.06em;
 }
 #story .story-kicker{text-transform:lowercase}
 
@@ -289,7 +320,7 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
   display:flex;flex-direction:column;
   background:var(--card-bg);
   border:1px solid var(--card-line);
-  box-shadow:0 30px 90px rgba(0,0,0,.9);
+  box-shadow:5px 7px 0 var(--shadow);
   overflow-y:auto;overscroll-behavior:contain;
   opacity:0;transform:translateY(14px) scale(.985);
   transition:opacity .28s ease,transform .28s cubic-bezier(.22,.61,.36,1);
@@ -308,11 +339,11 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
   cursor:pointer;
   transition:color .15s ease,border-color .15s ease;
 }
-.story-close:hover{color:var(--accent);border-color:rgba(232,184,75,.45)}
+.story-close:hover{color:var(--accent);border-color:rgba(255,122,61,.5)}
 
 .story-hero{
   width:100%;aspect-ratio:16/9;flex:none;
-  background:#101010 center/cover no-repeat;
+  background:var(--paper) center/cover no-repeat;
   border-bottom:1px solid var(--card-line);
 }
 .story-hero.none{display:none}
@@ -320,44 +351,47 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
 .story-body{padding:clamp(20px,3.4vw,34px)}
 .story-kicker{
   margin:0 0 6px;
-  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;
   color:var(--star-dim);
 }
 .story-kicker:empty{display:none}
 #story h2{
   margin:0 0 14px;
-  font-family:var(--display);font-variation-settings:var(--soft);
-  font-weight:400;font-size:clamp(28px,4.6vw,40px);
-  line-height:1.08;letter-spacing:-.01em;color:var(--star);
+  font-family:var(--display);
+  font-weight:700;font-size:clamp(28px,4.6vw,40px);
+  line-height:1.1;letter-spacing:-.03em;color:var(--star);
 }
 .story-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:22px}
 .story-meta .pill{
-  font-size:11px;letter-spacing:.06em;
-  border:1px solid var(--card-line);padding:3px 8px;color:rgba(242,242,240,.66);
+  display:inline-flex;align-items:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  height:26px;padding:0 11px;border-radius:999px;
+  border:1.5px solid var(--card-line);background:var(--paper);
+  color:rgba(243,236,220,.82);
 }
-.story-meta .yr{font-size:12px;color:var(--star-dim);margin-left:auto;font-variant-numeric:tabular-nums}
+.story-meta .yr{font-family:var(--mono);font-size:12px;color:var(--star-dim);margin-left:auto}
 
 .story-prose p{
   margin:0 0 15px;
   font-size:15px;line-height:1.68;
-  color:rgba(242,242,240,.80);
+  color:rgba(243,236,220,.82);
 }
 .story-prose p:last-child{margin-bottom:0}
 .story-prose ul{margin:0 0 15px;padding-left:20px}
 .story-prose li{
   font-size:15px;line-height:1.68;
-  color:rgba(242,242,240,.80);
+  color:rgba(243,236,220,.82);
   margin-bottom:8px;
 }
 .story-prose li::marker{color:var(--accent)}
-.story-prose a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(232,184,75,.4)}
+.story-prose a{color:var(--accent);text-decoration:none;border-bottom:1.5px solid rgba(255,122,61,.45)}
 .story-prose a:hover{border-bottom-color:var(--accent)}
 
 .story-link{
   display:inline-block;margin-top:22px;
-  font-size:13px;letter-spacing:.06em;
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:0;
   color:var(--accent);text-decoration:none;
-  border-bottom:1px solid rgba(232,184,75,.4);padding-bottom:2px;
+  border-bottom:1.5px solid rgba(255,122,61,.45);padding-bottom:2px;
 }
 .story-link:hover{border-bottom-color:var(--accent)}
 
@@ -372,18 +406,18 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
   transform:translate3d(var(--jx,0px),var(--jy,0px),0);
   display:flex;gap:18px;align-items:center;
   padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));
-  font-size:11.5px;letter-spacing:.05em;
+  font-family:var(--mono);font-size:11px;letter-spacing:0;
   opacity:0;visibility:hidden;transition:opacity .45s ease;
 }
 #footer.on{opacity:1;visibility:visible}
 #footer a{color:var(--star-dim);text-decoration:none}
-#footer a:hover{color:var(--accent)}
+#footer a:hover{color:var(--accent-ink)}
 #footer .spacer{flex:1}
 
 #hint{
   position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:20px;z-index:30;
   transform:translate3d(var(--jx,0px),var(--jy,0px),0);
-  font-size:11.5px;letter-spacing:.05em;color:var(--star-dim);
+  font-family:var(--mono);font-size:11px;letter-spacing:0;color:var(--star-dim);
   opacity:0;visibility:hidden;transition:opacity .45s ease;
 }
 #hint.on{opacity:1;visibility:visible}
