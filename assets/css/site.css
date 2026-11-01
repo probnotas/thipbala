@@ -32,16 +32,33 @@ body{
   margin:0;background:var(--bg);color:var(--star);
   font-family:var(--meta);
   -webkit-font-smoothing:antialiased;
+  /* Everything renders lower case. Done in CSS rather than in the copy so
+     the source text keeps its real capitalisation — remove this one line
+     and the whole site reverts. */
+  text-transform:lowercase;
 }
+
+/* A visually hidden heading, so the page still has one now that the
+   loading screen carries no text. */
+.sr-only{
+  position:absolute;width:1px;height:1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;margin:0;
+}
+
+/* Form controls carry their own UA text-transform, which blocks the
+   inherited lowercase above — buttons would otherwise render as authored. */
+button,input,select,textarea{text-transform:inherit}
 
 /* =====================================================================
    ACT 1 — the approach. A tall scroll track with a sticky canvas; the
    frame sequence is scrubbed from scroll progress across that track.
    ===================================================================== */
 
-#approach{position:relative;height:var(--track,520vh)}
+/* The clip plays itself (see main.js), so this is exactly one viewport
+   and the page never scrolls. */
+#approach{position:relative;height:100svh;overflow:hidden}
 #approach .sticky{
-  position:sticky;top:0;height:100svh;overflow:hidden;
+  position:relative;height:100svh;overflow:hidden;
   transform:translate3d(var(--jx,0px),var(--jy,0px),0);
 }
 #frames{
@@ -50,53 +67,27 @@ body{
 }
 
 /* =====================================================================
-   Loading screen — the first thing anyone sees. Just the greeting on
-   black while the opening frames arrive; it holds for a beat even on a
-   fast connection so it reads as an intro rather than a flash.
+   Loading screen — the first thing anyone sees. A bar on black while the
+   opening frames arrive; it holds for a beat even on a fast connection so
+   it reads as a beat rather than a flash, then the clip plays itself.
    ===================================================================== */
 #loader{
   /* fixed, and a sibling of .sticky rather than a child, so the pointer
      drift never moves it — the loading screen stays dead still. */
   position:fixed;inset:0;z-index:20;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:clamp(22px,4vh,40px);
+  display:flex;align-items:center;justify-content:center;
   background:var(--bg);
   transition:opacity .8s ease;
   padding:0 24px;
 }
 #loader.gone{opacity:0;pointer-events:none}
-#loader h1{
-  margin:0;
-  font-family:var(--display);
-  font-variation-settings:var(--soft);
-  font-weight:400;
-  font-size:clamp(34px,7.5vw,96px);
-  line-height:1.05;
-  letter-spacing:-.015em;
-  color:var(--star);
-  text-align:center;
-}
-/* Each word arrives on its own beat. */
-#loader h1 span{
-  display:inline-block;
-  opacity:0;
-  animation:wordIn .62s cubic-bezier(.22,.61,.36,1) forwards;
-}
-#loader h1 span:nth-child(1){animation-delay:.10s}
-#loader h1 span:nth-child(2){animation-delay:.38s}
-#loader h1 span:nth-child(3){animation-delay:.66s}
-@keyframes wordIn{
-  from{opacity:0;transform:translateY(.34em)}
-  to  {opacity:1;transform:none}
-}
-
 /* Progress toward being able to start — see dismissLoader() in main.js. */
 #loader .bar{
-  width:min(160px,38vw);height:2px;
+  width:min(200px,46vw);height:2px;
   background:rgba(242,242,240,.13);
   position:relative;overflow:hidden;
   opacity:0;
-  animation:fadeIn .5s ease .95s forwards;
+  animation:fadeIn .6s ease .15s forwards;
 }
 #loader .bar i{
   position:absolute;inset:0 auto 0 0;width:0%;
@@ -106,7 +97,6 @@ body{
 @keyframes fadeIn{to{opacity:1}}
 
 @media (prefers-reduced-motion:reduce){
-  #loader h1 span{animation:none;opacity:1}
   #loader .bar{animation:none;opacity:1}
   #loader .bar i{transition:none}
 }
@@ -158,56 +148,6 @@ body{
 }
 @media (prefers-reduced-motion:reduce){
   #grain{animation:none}
-}
-
-/* =====================================================================
-   Greeting — anchored to the cockpit window opening and scaled with it.
-   Position and font-size are written from JS each frame (see main.js);
-   font-size rather than transform:scale so the type stays crisp as it
-   grows past 5x. The dark halo keeps it legible where the opening's
-   struts catch the light.
-   ===================================================================== */
-#greeting{
-  position:absolute;z-index:12;
-  margin:0;
-  transform:translate(-50%,-50%);
-  transform-origin:center;
-  font-family:var(--display);
-  font-variation-settings:var(--soft);
-  font-weight:400;
-  font-size:100px;                 /* measured once, then overwritten */
-  line-height:1;
-  letter-spacing:.01em;
-  white-space:nowrap;
-  color:var(--star);
-  text-shadow:0 0 .28em rgba(0,0,0,.85),0 0 .9em rgba(0,0,0,.6);
-  opacity:0;
-  pointer-events:none;
-  will-change:left,top,font-size;
-}
-
-/* The window-anchored greeting is parked (SHOW_GREETING in main.js) and
-   reduced motion skips the approach entirely. Either way it is fully
-   removed — the loading screen's h1 already carries the same words, and
-   two copies would be read out twice. */
-#greeting.off{display:none}
-
-/* scroll cue — fades out once the approach is underway */
-#cue{
-  position:absolute;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));
-  transform:translateX(-50%);z-index:15;
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  font-size:10.5px;letter-spacing:.22em;color:var(--star-dim);
-  transition:opacity .4s ease;pointer-events:none;
-}
-#cue .line{
-  width:1px;height:26px;
-  background:linear-gradient(to bottom,var(--star-dim),transparent);
-  animation:drift 2.2s ease-in-out infinite;
-}
-@keyframes drift{
-  0%,100%{opacity:.25;transform:translateY(-3px)}
-  50%    {opacity:.9; transform:translateY(3px)}
 }
 
 /* =====================================================================
@@ -322,6 +262,7 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
   font-family:var(--meta);font-size:11px;
   color:rgba(242,242,240,.4);letter-spacing:.1em;
 }
+#story .story-kicker{text-transform:lowercase}
 
 /* =====================================================================
    Story modal — the full write-up behind a card's "Read more".
@@ -447,8 +388,7 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
 }
 #hint.on{opacity:1;visibility:visible}
 
-body.framed #footer,body.framed #hint,body.framed #cue,
-body.framed #greeting{opacity:0;pointer-events:none}
+body.framed #footer,body.framed #hint{opacity:0;pointer-events:none}
 
 /* ---- chart load sequence ---- */
 .lyr{opacity:0;transition:opacity .7s ease}
@@ -462,7 +402,6 @@ body.framed #greeting{opacity:0;pointer-events:none}
   .lyr{transition:none}
   .node .ring,.node .core,.node .halo,.node .grp{transition:none}
   .node:hover .grp,.node:focus-visible .grp,.node.open .grp{transform:none}
-  #cue .line{animation:none}
 }
 
 /* =====================================================================

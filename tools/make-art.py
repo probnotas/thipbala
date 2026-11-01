@@ -147,26 +147,6 @@ art["stringhoopers"] = grid() + stars(89) + (
     f'<path d="M30 168 Q 160 132 290 168" fill="none" stroke="{LINE}" stroke-width="1.1"/>'
     f'<line x1="160" y1="40" x2="160" y2="78" stroke="{FAINT}" stroke-dasharray="3 5"/>')
 
-# --- SV Robotics: a small machine, taught down a wire ---
-art["svrobotics"] = grid() + stars(101) + (
-    f'<rect x="124" y="74" width="72" height="54" rx="6" fill="none" stroke="{LINE}" stroke-width="1.3"/>'
-    f'<circle cx="146" cy="96" r="6" fill="none" stroke="{LINE}"/>'
-    f'<circle cx="174" cy="96" r="6" fill="none" stroke="{LINE}"/>'
-    f'<circle cx="146" cy="96" r="2" fill="{ACCENT}"/><circle cx="174" cy="96" r="2" fill="{ACCENT}"/>'
-    f'<path d="M142 114 h36" stroke="{FAINT}" stroke-width="1.4"/>'
-    f'<line x1="160" y1="74" x2="160" y2="58" stroke="{LINE}"/><circle cx="160" cy="54" r="3.4" fill="{ACCENT}"/>'
-    f'<path d="M124 100 H70 V150" fill="none" stroke="{FAINT}"/>'
-    f'<path d="M196 100 H250 V150" fill="none" stroke="{FAINT}"/>'
-    + "".join(f'<circle cx="{x}" cy="150" r="2.2" fill="none" stroke="{FAINT}"/>' for x in (70, 250)) +
-    "".join(f'<rect x="{x}" y="138" width="14" height="10" fill="none" stroke="{DIM}"/>' for x in (134, 172)))
-
-# --- Castle Lane Digital: deliberately quiet, no copy to illustrate yet ---
-art["castlelane"] = grid() + stars(131) + (
-    f'<rect x="112" y="56" width="96" height="68" fill="none" stroke="{FAINT}" stroke-width="1"/>'
-    f'<rect x="130" y="74" width="60" height="32" fill="none" stroke="{LINE}" stroke-width="1.2"/>'
-    f'<line x1="160" y1="124" x2="160" y2="148" stroke="{FAINT}"/>'
-    f'<circle cx="160" cy="90" r="4" fill="{ACCENT}" opacity=".8"/>')
-
 os.makedirs(OUT, exist_ok=True)
 for name, body in art.items():
     path = os.path.join(OUT, name + ".svg")

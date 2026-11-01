@@ -18,18 +18,10 @@
   const GRAIN = 0.5;
   const GRAIN_CHART = 0.35;
 
-  // The window-anchored greeting is parked, not deleted: flip this to true
-  // to bring it back. NOTE: window-track.js was measured against the
-  // PREVIOUS clip — re-run tools/track-window.py before re-enabling, or
-  // the text will not sit on the window.
-  const SHOW_GREETING = false;
-
   const approach = document.getElementById("approach");
   const canvas   = document.getElementById("frames");
   const loader   = document.getElementById("loader");
   const bar      = loader.querySelector(".bar i");
-  const cue      = document.getElementById("cue");
-  const greeting = document.getElementById("greeting");
   const stage    = document.getElementById("chart-stage");
   const footer   = document.getElementById("footer");
   const hint     = document.getElementById("hint");
@@ -222,11 +214,8 @@
 
   /* ---- reduced motion: skip the approach entirely ---- */
   if (reduce) {
-    approach.style.setProperty("--track", "100svh");
     root.style.setProperty("--grain", String(GRAIN_CHART));
-    greeting.classList.add("off");
     loader.classList.add("gone");
-    cue.style.opacity = 0;
     stage.style.opacity = 1;
     stage.classList.add("on");
     setHandover(true);
@@ -234,40 +223,7 @@
     return;
   }
 
-  /* ---- greeting ------------------------------------------------------
-     The text lives on the window plane, so it is positioned and sized
-     from the tracked opening rather than from the viewport: both its
-     centre and its width are fractions of the RENDERED frame, which is
-     what keeps it welded to the window through the `cover` crop at any
-     aspect ratio. Width is converted to a font-size via the type's own
-     measured width, so it holds regardless of which face is loaded.
-     -------------------------------------------------------------------- */
-  const TRACK = window.WINDOW_TRACK;
-  let natWidth = 0;                       // text width at font-size 100px
-
-  function measureGreeting() {
-    greeting.style.fontSize = "100px";
-    greeting.style.opacity = "0";
-    natWidth = greeting.getBoundingClientRect().width;
-  }
-
-  function placeGreeting(frame) {
-    if (!SHOW_GREETING || !natWidth) return;
-    const r = video.frameRect();
-    if (!r) return;
-
-    const w = TRACK.width(frame);
-    const target = TRACK.fill * w * r.w;              // desired text width, px
-
-    greeting.style.fontSize = (100 * target / natWidth) + "px";
-    greeting.style.left = (r.x + TRACK.cx(frame) * r.w) + "px";
-    greeting.style.top  = (r.y + TRACK.cy(frame) * r.h) + "px";
-
-    const f = (w - TRACK.fadeFrom) / (TRACK.fadeTo - TRACK.fadeFrom);
-    greeting.style.opacity = String(Math.max(0, Math.min(1, 1 - f)));
-  }
-
-  /* ---- the scroll-scrubbed sequence ---- */
+  /* ---- the sequence ---- */
   /* ---- loading screen -------------------------------------------------
      The bar tracks progress toward being able to START, not toward the
      whole sequence — scrubbing begins after the first coarse pass, about
@@ -301,7 +257,7 @@
     setTimeout(() => {
       bar.style.width = "100%";
       loader.classList.add("gone");
-      update();
+      play();
     }, wait);
   }
 
@@ -312,47 +268,24 @@
   video.load();
   setTimeout(dismissLoader, 8000);          // safety net: never strand anyone
 
-  // The greeting is sized from its own rendered width, so it must be
-  // measured in the real face — not the fallback — or it jumps on swap.
-  if (SHOW_GREETING) {
-    if (TRACK && TRACK.stale) {
-      console.warn("[greeting] window-track.js was measured against a " +
-                   "previous clip — re-run tools/track-window.py or the " +
-                   "text will not sit on the window.");
-    }
-    measureGreeting();
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => { measureGreeting(); update(); });
-    }
-  } else {
-    greeting.classList.add("off");
-  }
+  /* ---- playback ------------------------------------------------------
+     The clip used to be scrubbed by scroll. It now plays itself once the
+     first frames are in, so the page never scrolls and `progress` is the
+     only thing driving the sequence, the chart dissolve and the grain.
 
-  // rAF-coalesced scroll. The pending id is tracked rather than a boolean
-  // latch: a browser that drops the callback (backgrounded tab, hidden
-  // pane) would otherwise leave the latch stuck and kill scrolling for the
-  // rest of the session. visibilitychange clears it and resyncs.
-  let raf = 0;
-  function onScroll() {
-    if (raf) return;
-    raf = requestAnimationFrame(() => { raf = 0; update(); });
-  }
-  document.addEventListener("visibilitychange", () => {
-    if (raf) { cancelAnimationFrame(raf); raf = 0; }
-    update();
-  });
+     DURATION is close to the clip's own 5.04s, so the camera move runs at
+     roughly the speed it was authored at.
+     -------------------------------------------------------------------- */
+  const DURATION = 4800;
+  let progress = 0;
+  let playRaf = 0, playStart = 0, playing = false;
 
-  function update() {
-    const rect = approach.getBoundingClientRect();
-    const total = approach.offsetHeight - window.innerHeight;
-    const p = total > 0 ? Math.max(0, Math.min(1, -rect.top / total)) : 0;
-
-    video.seek(p);
+  function render() {
+    video.seek(progress);
     placeChart();
-    placeGreeting(p * (window.FRAME_MANIFEST.count - 1));
 
-    // Chart dissolves in over the tail of the approach.
-    const f = Math.max(0, Math.min(1, (p - FADE_START) / (FADE_END - FADE_START)));
+    // Chart dissolves in over the tail of the clip.
+    const f = Math.max(0, Math.min(1, (progress - FADE_START) / (FADE_END - FADE_START)));
     stage.style.opacity = f;
     // Eases from the clip's grain to the chart's lighter one across the
     // same dissolve, so there is no step at the moment of the swap.
@@ -360,14 +293,58 @@
       (GRAIN + (GRAIN_CHART - GRAIN) * f).toFixed(3));
     stage.classList.toggle("on", f > 0);
     setHandover(f >= 1);
-
-    cue.style.opacity = p > 0.02 ? 0 : 1;
   }
 
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll, { passive: true });
+  function frame(now) {
+    playRaf = 0;
+    progress = Math.min(1, (now - playStart) / DURATION);
+    render();
+    if (progress < 1) playRaf = requestAnimationFrame(frame);
+    else playing = false;
+  }
 
-  // The browser may restore a scroll offset on reload.
+  function play() {
+    if (playing || progress >= 1) return;
+    playing = true;
+    playStart = performance.now();
+    playRaf = requestAnimationFrame(frame);
+  }
+
+  // Nobody should be stuck watching an intro they have already seen.
+  function skip() {
+    if (progress >= 1) return;
+    if (playRaf) { cancelAnimationFrame(playRaf); playRaf = 0; }
+    playing = false;
+    progress = 1;
+    render();
+  }
+  document.addEventListener("pointerdown", e => {
+    if (!playing) return;
+    if (e.target.closest("#story")) return;
+    skip();
+  });
+  document.addEventListener("keydown", e => {
+    if (!playing) return;
+    if (e.key === "Escape" || e.key === "Enter" || e.key === " ") skip();
+  });
+
+  /* A tab backgrounded mid-play has its rAF suspended, so the clock would
+     run on without the frames keeping up and the intro would jump on
+     return. Restart the run from wherever it actually got to. */
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (playRaf) { cancelAnimationFrame(playRaf); playRaf = 0; }
+      playing = false;
+    } else if (progress < 1) {
+      playStart = performance.now() - progress * DURATION;
+      play();
+    } else {
+      render();
+    }
+  });
+
+  window.addEventListener("resize", render, { passive: true });
+
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  update();
+  render();
 })();

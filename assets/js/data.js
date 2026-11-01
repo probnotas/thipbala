@@ -254,21 +254,7 @@ window.NODES = [
    "The concept was simple: create a space where young people could come together, learn something new, play some basketball, eat some good food, and hopefully walk away feeling a little more connected to themselves and their community. But as we built the program, we realized it could be much more than that. Each training camp had a different focus, from sports analytics and media to mental health, cooking, photography, self-care, and team-building. The idea was to give these kids experiences that went beyond basketball, while still using basketball as the thing that brought everyone together.",
 
    "There\u2019s something really powerful about being surrounded by people who share parts of your childhood experience, while also being exposed to completely different perspectives, cultures, and interests. I started this because I missed what Parkdale had given me growing up, but I ended up realizing that what we were really building was a community. Basketball and food were the vehicle; the real goal was giving young people a place to learn, connect, and feel like they belonged."
-  ]},
-
- {star:"Aldebaran", w:3, title:"SV Robotics",
-  role:"Instructor", year:"", tags:["Robotics", "Education"],
-  href:"#", thumb:"assets/img/svrobotics.svg",
-  desc:"Teaching robotics to kids from the comfort of their home.",
-  pts:[],
-  story:[]},
-
- {star:"Rasalhague", w:3, title:"Castle Lane Digital",
-  role:"", year:"", tags:[],
-  href:"#", thumb:"assets/img/castlelane.svg",
-  desc:"",
-  pts:[],
-  story:[]}
+  ]}
 ];
 
 /* Footer links. Anything left as "#" is hidden rather than rendered as a

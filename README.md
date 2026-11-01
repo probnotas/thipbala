@@ -1,7 +1,7 @@
 # Star Chart Portfolio
 
-Scroll-driven intro that flies through a spacecraft window and lands on an
-interactive star chart. Fifteen of the stars are real portfolio entries.
+A self-playing intro that flies through a spacecraft window and lands on an
+interactive star chart. Eight of the stars are real portfolio entries.
 
 ```
 index.html                     page shell, both acts
@@ -10,17 +10,14 @@ assets/js/data.js              star catalogue, constellation figures, THE 15 NOD
 assets/js/frames.manifest.js   generated — frame count + paths
 assets/js/scroll-video.js      scroll-scrubbed frame sequence engine
 assets/js/star-chart.js        the interactive chart
-assets/js/main.js              approach → chart handoff
+assets/js/main.js              playback → chart handoff
 assets/frames/{desktop,mobile} the JPEG sequence
 media/approach.mp4             source clip
-assets/js/window-track.js      generated — window position/scale per frame
 assets/js/pointer-drift.js     cursor-reactive scene drift
 assets/js/story.js             the "Read more" write-up modal
 assets/img/                    card + modal artwork
 tools/make-art.py              regenerates the generated panels
 tools/build-frames.sh          regenerates the sequence
-tools/track-window.py          regenerates window-track.js
-tools/README-tracking.md       how the tracking works
 ```
 
 Run it from a local server (the frames are fetched, so `file://` will not work):
@@ -48,25 +45,40 @@ On Vercel, import the repo at vercel.com/new and deploy with framework
 preset **Other** and no build command. Pushes to `main` then redeploy on
 their own.
 
+## Playback
+
+The clip is **not** scroll-driven. The page is exactly one viewport tall and
+never scrolls: once the loading bar fills, `play()` in `main.js` runs the
+frame sequence on a clock (`DURATION`, 4800ms — close to the clip's own
+5.04s) and hands over to the chart at the end.
+
+`progress` is the single value driving everything — the frame, the chart
+dissolve and the grain level. Anywhere the old build read scroll position,
+it now reads that.
+
+Two things worth knowing:
+
+- **A click, tap, Escape, Enter or Space skips to the end.** An intro you
+  cannot leave gets old by the second visit.
+- **A backgrounded tab pauses it.** `rAF` is suspended there but a wall
+  clock is not, so without this the intro would jump forward on return;
+  `visibilitychange` restarts the run from wherever it actually got to.
+
+Reduced motion skips playback entirely and opens on the chart.
+
 ## The loading screen
 
-The first thing anyone sees: `hi, im thip.` centred on black, in Fraunces
-with its `SOFT` axis at 100. It is the page's `<h1>`.
+A single progress bar on black. No text — the page's `<h1>` is now a
+visually hidden "thip bala", so the document still has a heading.
 
-The words arrive one at a time — each is its own `<span>` with a staggered
-`animation-delay` (100 / 380 / 660ms). Because the not-yet-visible words
-still occupy their space, nothing reflows as they land; they fade in place.
-
-Underneath is a thin progress bar. It tracks progress toward being able to
+The bar It tracks progress toward being able to
 **start**, not toward the whole sequence: scrubbing begins after the first
 coarse pass, roughly 6% of the payload, and a bar that crept to 6% and then
 vanished would read as broken. Two things gate the start — enough frames,
-and `MIN_LOADER_MS` (2000ms, long enough for the words to finish) — so the
+and `MIN_LOADER_MS` (2000ms) — so the
 bar shows the lesser of the two and lands on 100% exactly as the screen
 lifts. An 8s safety timer dismisses it regardless, so a failed fetch cannot
 strand anyone.
-
-To change the words, edit the spans inside `#loader` in `index.html`.
 
 ## Grain
 
@@ -263,7 +275,6 @@ gets, since there is no clip to match.
 it to `true` to bring it back. Everything it needs is still in place. While
 it is off the `<h1>` stays in the DOM, visually hidden, so the page keeps
 its heading for screen readers.
-
 
 When on, it is the page's `<h1>`, anchored to the cockpit window
 opening and scales with it, so it reads as painted on the window while the
