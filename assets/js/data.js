@@ -225,9 +225,11 @@ window.ABOUT = {
   year: "",
   tags: ["toronto"],
   thumb: "assets/img/thip.jpg",
-  // A square portrait in a 16:9 hero: a centre crop would take the top
-  // 22% of the frame, which is his head. Bias the crop upward instead.
-  thumbFocus: "50% 12%",
+  // A 16:9 hero shows only 56% of a square portrait's height, which lands
+  // on the face alone. 4:3 shows 75% — head and shoulders — and anchoring
+  // to the top keeps all the hair.
+  thumbRatio: "4 / 3",
+  thumbFocus: "50% 0%",
   href: "https://linkedin.com/in/thipeeshanb",
   cta: "linkedin",
   desc: "",

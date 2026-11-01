@@ -49,9 +49,11 @@
   const n = (window.NODES || []).length;
   const count = WORDS[n] || String(n);
   const lead = count.charAt(0).toUpperCase() + count.slice(1);
-  hint.textContent = window.matchMedia("(hover:none)").matches
-    ? `${lead} of these stars are his. Swipe to explore, tap one.`
-    : `${lead} of these stars are his. Hover one.`;
+  // any-hover, not hover: a laptop with a touchscreen reports (hover:none)
+  // while still having a mouse, and should be told to hover.
+  hint.textContent = window.matchMedia("(any-hover:hover)").matches
+    ? `${lead} of these stars are his. Hover one.`
+    : `${lead} of these stars are his. Swipe to explore, tap one.`;
 
   /* ---- build the chart up front; it is just invisible until needed ---- */
   const chart = new window.StarChart(document);

@@ -302,23 +302,36 @@
       try { localStorage.setItem(STORE, JSON.stringify([...visited])); } catch (e) {}
     }
 
-    const touch = window.matchMedia("(hover:none)").matches;
+    /* Hover is decided per POINTER, not per media query.
+       `(hover:none)` matches on plenty of machines that do have a mouse —
+       a laptop with a touchscreen is the common one — and gating on it
+       meant those visitors got no hover handlers at all and nothing
+       happened when they pointed at a star. Filtering on pointerType
+       instead gives a hybrid device both: hover from its mouse, tap from
+       its finger. */
+    let lastPointerType = "mouse";
+    document.addEventListener("pointerdown", e => { lastPointerType = e.pointerType; },
+                              { capture: true, passive: true });
+
     root.querySelectorAll(".node").forEach(node => {
-      if (!touch) {
-        node.addEventListener("mouseenter", () => {
-          if (window.StoryModal && window.StoryModal.isOpen()) return;
-          show(node);
-        });
-        node.addEventListener("mouseleave", e => {
-          if (card.contains(e.relatedTarget)) return;
-          setTimeout(() => { if (!card.matches(":hover")) hide(); }, 60);
-        });
-      }
+      node.addEventListener("pointerenter", e => {
+        if (e.pointerType !== "mouse") return;
+        if (window.StoryModal && window.StoryModal.isOpen()) return;
+        show(node);
+      });
+      node.addEventListener("pointerleave", e => {
+        if (e.pointerType !== "mouse") return;
+        if (card.contains(e.relatedTarget)) return;
+        setTimeout(() => { if (!card.matches(":hover")) hide(); }, 60);
+      });
       node.addEventListener("focus", () => show(node));
       node.addEventListener("click", e => {
         e.preventDefault();
         markVisited(node);
-        if (open === node && touch) hide(); else show(node);
+        // A second tap closes; a second click with a mouse should not,
+        // because the card is already open under the cursor.
+        const byTouch = lastPointerType !== "mouse";
+        if (open === node && byTouch) hide(); else show(node);
       });
       node.addEventListener("keydown", e => {
         if (e.key === "Enter" || e.key === " ") {
@@ -333,10 +346,10 @@
       if (open && window.StoryModal) window.StoryModal.show(open._n);
     });
 
-    card.addEventListener("mouseleave", () => {
+    card.addEventListener("pointerleave", e => {
       // Not while the modal is up: the pointer has legitimately left the
       // card, but closing it would drop the node the modal belongs to.
-      if (touch) return;
+      if (e.pointerType !== "mouse") return;
       if (window.StoryModal && window.StoryModal.isOpen()) return;
       hide();
     });

@@ -57,8 +57,11 @@
 
     function fill(n) {
       hero.style.backgroundImage = n.thumb ? `url("${n.thumb}")` : "";
-      // A square portrait in a 16:9 hero loses a fifth of its height to the
-      // crop; thumbFocus says which fifth to give up.
+      /* A 16:9 hero suits the wide line-art panels, but it only ever shows
+         56% of a square portrait's height — enough for a face, not for a
+         head and shoulders. A record can pick its own shape, and say which
+         part of the crop to keep. */
+      hero.style.aspectRatio = n.thumbRatio || "";
       hero.style.backgroundPosition = n.thumbFocus || "center";
       hero.classList.toggle("none", !n.thumb);
 

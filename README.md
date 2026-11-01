@@ -121,10 +121,16 @@ it moving.
 
 ## Images
 
-`thumb` takes any image. A square portrait in a 16:9 hero loses ~22% of its
-height to the crop, which on a headshot is the head — so a record can set
-`thumbFocus` (a `background-position`) to choose which part survives. The
-about portrait uses `50% 12%`.
+`thumb` takes any image. The hero defaults to 16:9, which suits the wide
+line-art panels but shows only **56%** of a square portrait's height —
+enough for a face, not for a head and shoulders. Two optional fields fix
+that per record:
+
+- `thumbRatio` — the hero's shape. The about portrait uses `4 / 3`, which
+  shows 75% of the square.
+- `thumbFocus` — a `background-position` saying which part of the crop to
+  keep. The portrait uses `50% 0%`, anchoring to the top so none of the
+  hair is lost.
 
 ## About me
 
@@ -351,6 +357,18 @@ target, so a still cursor costs nothing.
 The clip's final frame *is* the star chart, so the live SVG cross-dissolves
 in over the last 11% of the scroll track (`FADE_START`/`FADE_END` in
 `main.js`). The chart only takes pointer events once the dissolve completes.
+
+## Hover and touch
+
+Hover is decided **per pointer, not per media query**. `(hover: none)`
+matches on plenty of machines that do have a mouse — a laptop with a
+touchscreen is the common case — and gating the handlers on it meant those
+visitors got no hover at all: pointing at a star did nothing.
+
+The node listeners are `pointerenter` / `pointerleave` filtered on
+`pointerType === "mouse"`, so a hybrid device gets hover from its mouse and
+tap-to-toggle from its finger. The hint copy uses `(any-hover: hover)` for
+the same reason.
 
 ## Phones
 
