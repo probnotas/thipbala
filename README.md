@@ -68,17 +68,14 @@ Reduced motion skips playback entirely and opens on the chart.
 
 ## The loading screen
 
-A single progress bar on black. No text — the page's `<h1>` is now a
-visually hidden "thip bala", so the document still has a heading.
+There isn't one. The clip is the loading screen: it plays from the first
+frame that lands, and the only chrome over it is a ring at the bottom.
 
-The bar It tracks progress toward being able to
-**start**, not toward the whole sequence: scrubbing begins after the first
-coarse pass, roughly 6% of the payload, and a bar that crept to 6% and then
-vanished would read as broken. Two things gate the start — enough frames,
-and `MIN_LOADER_MS` (2000ms) — so the
-bar shows the lesser of the two and lands on 100% exactly as the screen
-lifts. An 8s safety timer dismisses it regardless, so a failed fetch cannot
-strand anyone.
+The ring counts **one monotonic value** so it never travels backwards —
+frames arriving take the first 18% (`LOAD_SHARE` in `main.js`), the run
+toward the chart takes the rest. It retires when the chart lands. An 8s
+safety timer starts playback regardless, so a slow fetch cannot strand
+anyone on a still frame.
 
 ## Grain
 
@@ -122,14 +119,30 @@ data URI for contrast and the two constants for strength. Reduced motion
 opens straight on the chart at `GRAIN_CHART`, and keeps the grain but stops
 it moving.
 
+## About me
+
+The filled orange button at the top right of the chart opens
+`window.ABOUT` from `data.js` through the same write-up modal the nodes
+use — it is just a node-shaped record, so it takes the same fields.
+
+It is the only filled control on the page, which is what makes it read as
+the thing to press on a chart made of thin line work.
+
+**Its copy is a draft.** It was assembled only from facts already stated in
+the write-ups (the degree, the CubeSat, the roles, the weekends) — no
+biography was invented — and the last paragraph says so in the text.
+Replace it.
+
 ## Editing content
 
 Everything a person needs to change lives in `assets/js/data.js`:
 `NODES` (the experiences) and `LINKS` (footer). Each node's `star` must
 match a name in `CAT` — that is what positions it on the sky.
 
-Per node: `title`, `desc` (one line), `role`, `year`, `tags`, `pts`
-(bullets), `href` and an optional `cta` to relabel the link. The card
+Per node: `title`, `desc`, `role`, `year`, `tags`, `pts`
+(bullets), `href` and an optional `cta` to relabel the link. `desc` is a
+full paragraph — in practice one lifted from `story` — and the card clamps
+it to five lines, with "read more" carrying the rest. The card
 collapses any block you leave empty rather than rendering an empty shell,
 so a half-written entry degrades quietly. `href` values starting with
 `http` open in a new tab.

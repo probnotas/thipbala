@@ -95,38 +95,31 @@ button,input,select,textarea{text-transform:inherit}
 }
 
 /* =====================================================================
-   Loading screen — the first thing anyone sees. A bar on black while the
-   opening frames arrive; it holds for a beat even on a fast connection so
-   it reads as a beat rather than a flash, then the clip plays itself.
+   Loading ring — the clip is the loading screen, so this is the only
+   chrome over it. One value, counted monotonically: frames arriving
+   first, then the run toward the chart, so it never travels backwards.
    ===================================================================== */
-#loader{
-  /* fixed, and a sibling of .sticky rather than a child, so the pointer
-     drift never moves it — the loading screen stays dead still. */
-  position:fixed;inset:0;z-index:20;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--bg);
-  transition:opacity .8s ease;
-  padding:0 24px;
+#ring{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(26px + env(safe-area-inset-bottom,0px));
+  z-index:22;width:44px;height:44px;
+  pointer-events:none;
+  transition:opacity .5s ease;
 }
-#loader.gone{opacity:0;pointer-events:none}
-/* Progress toward being able to start — see dismissLoader() in main.js. */
-#loader .bar{
-  width:min(200px,46vw);height:2px;
-  background:rgba(243,236,220,.16);
-  position:relative;overflow:hidden;
-  opacity:0;
-  animation:fadeIn .6s ease .15s forwards;
+#ring.gone{opacity:0}
+#ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+#ring circle{fill:none;stroke-width:2;}
+#ring .track{stroke:rgba(243,236,220,.16)}
+#ring .fill{
+  stroke:var(--accent);
+  stroke-linecap:round;
+  /* 2*pi*19 */
+  stroke-dasharray:119.38;
+  stroke-dashoffset:119.38;
+  transition:stroke-dashoffset .2s linear;
 }
-#loader .bar i{
-  position:absolute;inset:0 auto 0 0;width:0%;
-  background:var(--accent);
-  transition:width .3s cubic-bezier(.4,0,.2,1);
-}
-@keyframes fadeIn{to{opacity:1}}
-
 @media (prefers-reduced-motion:reduce){
-  #loader .bar{animation:none;opacity:1}
-  #loader .bar i{transition:none}
+  #ring .fill{transition:none}
 }
 
 /* =====================================================================
@@ -267,7 +260,15 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
   font-family:var(--display);font-weight:700;
   font-size:21px;line-height:1.1;letter-spacing:-.03em;margin:0 0 6px;
 }
-#card .desc{font-size:13px;line-height:1.45;color:rgba(243,236,220,.80);margin:0 0 9px}
+/* The description is a real paragraph now (up to ~640 chars), so the card
+   shows an opening and "read more" carries the rest. Without the clamp a
+   card runs past the viewport and the vertical placement has nothing to
+   work with. */
+#card .desc{
+  font-size:13px;line-height:1.5;color:rgba(243,236,220,.80);margin:0 0 10px;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;
+  overflow:hidden;
+}
 #card .meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:10px}
 #card .pill{
   display:inline-flex;align-items:center;
@@ -422,7 +423,33 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
 }
 #hint.on{opacity:1;visibility:visible}
 
-body.framed #footer,body.framed #hint{opacity:0;pointer-events:none}
+/* =====================================================================
+   About me — the only filled control here, so it reads as the one thing
+   to press on a chart made of thin line work.
+   ===================================================================== */
+#about{
+  position:fixed;z-index:31;
+  top:calc(16px + env(safe-area-inset-top,0px));
+  right:max(18px,2.4vw);
+  display:inline-flex;align-items:center;gap:7px;
+  min-height:38px;padding:0 16px;
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:0;
+  color:#16130f;background:var(--accent);
+  border:1.5px solid var(--accent);border-radius:999px;
+  box-shadow:3px 4px 0 var(--shadow);
+  cursor:pointer;
+  opacity:0;visibility:hidden;
+  transition:opacity .45s ease,transform .14s ease,box-shadow .14s ease;
+}
+#about.on{opacity:1;visibility:visible}
+#about::before{
+  content:"";width:7px;height:7px;border-radius:50%;
+  background:#16130f;opacity:.55;
+}
+#about:hover{transform:translate(1px,1px);box-shadow:2px 3px 0 var(--shadow)}
+#about:active{transform:translate(3px,4px);box-shadow:0 0 0 var(--shadow)}
+
+body.framed #footer,body.framed #hint,body.framed #about{opacity:0;pointer-events:none}
 
 /* ---- chart load sequence ---- */
 .lyr{opacity:0;transition:opacity .7s ease}
@@ -491,5 +518,7 @@ body.framed #footer,body.framed #hint{opacity:0;pointer-events:none}
     max-height:72%;overflow-y:auto;
   }
   #card .thumb{aspect-ratio:21/9}
+  #card .desc{-webkit-line-clamp:7}
+  #about{min-height:34px;padding:0 13px;font-size:11px}
   #footer{display:none}
 }

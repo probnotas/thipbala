@@ -20,8 +20,9 @@
 
   const approach = document.getElementById("approach");
   const canvas   = document.getElementById("frames");
-  const loader   = document.getElementById("loader");
-  const bar      = loader.querySelector(".bar i");
+  const ring     = document.getElementById("ring");
+  const ringFill = ring.querySelector(".fill");
+  const about    = document.getElementById("about");
   const stage    = document.getElementById("chart-stage");
   const footer   = document.getElementById("footer");
   const hint     = document.getElementById("hint");
@@ -209,13 +210,15 @@
     stage.classList.toggle("live", on);
     footer.classList.toggle("on", on);
     hint.classList.toggle("on", on);
-    if (on) { placeChart(); centrePan(); } else chart.hideCard();
+    about.classList.toggle("on", on);
+    if (on) { placeChart(); centrePan(); ring.classList.add("gone"); }
+    else chart.hideCard();
   }
 
   /* ---- reduced motion: skip the approach entirely ---- */
   if (reduce) {
     root.style.setProperty("--grain", String(GRAIN_CHART));
-    loader.classList.add("gone");
+    ring.classList.add("gone");
     stage.style.opacity = 1;
     stage.classList.add("on");
     setHandover(true);
@@ -224,49 +227,45 @@
   }
 
   /* ---- the sequence ---- */
-  /* ---- loading screen -------------------------------------------------
-     The bar tracks progress toward being able to START, not toward the
-     whole sequence — scrubbing begins after the first coarse pass, about
-     6% of the payload, and a bar that crept to 6% and then vanished would
-     read as broken. Two things gate the start: enough frames, and a
-     minimum on-screen time that lets the words finish arriving. Progress
-     is the lesser of the two, so the bar lands on 100% exactly as the
-     screen lifts.
+  /* ---- loading ring ---------------------------------------------------
+     There is no loading screen any more: the clip is it. The ring is the
+     only chrome over it, and it counts ONE monotonic value so it never
+     travels backwards — frames arriving take the first slice, the run
+     toward the chart takes the rest.
      -------------------------------------------------------------------- */
-  const MIN_LOADER_MS = 2000;          // covers the staggered word reveal
-  const started = performance.now();
-  let dismissed = false;
-  let loadFrac = 0;
+  const CIRC = 119.38;                 // 2*pi*19, matching the <circle r>
+  const LOAD_SHARE = 0.18;             // of the ring given to loading
+  let loadFrac = 0, startedPlaying = false;
 
-  function loaderProgress() {
-    const byTime = (performance.now() - started) / MIN_LOADER_MS;
-    return Math.max(0, Math.min(1, Math.min(loadFrac, byTime)));
+  function setRing(v) {
+    const t = Math.max(0, Math.min(1, v));
+    ringFill.style.strokeDashoffset = (CIRC * (1 - t)).toFixed(2);
+    ring.setAttribute("aria-valuenow", Math.round(t * 100));
   }
 
-  function tickLoader() {
-    if (loader.classList.contains("gone")) return;
-    bar.style.width = (loaderProgress() * 100).toFixed(1) + "%";
-    requestAnimationFrame(tickLoader);
+  function ringTick() {
+    if (ring.classList.contains("gone")) return;
+    setRing(startedPlaying
+      ? LOAD_SHARE + (1 - LOAD_SHARE) * progress
+      : LOAD_SHARE * loadFrac);
+    requestAnimationFrame(ringTick);
   }
-  requestAnimationFrame(tickLoader);
 
-  function dismissLoader() {
-    if (dismissed) return;
-    dismissed = true;
-    const wait = Math.max(0, MIN_LOADER_MS - (performance.now() - started));
-    setTimeout(() => {
-      bar.style.width = "100%";
-      loader.classList.add("gone");
-      play();
-    }, wait);
+  let begun = false;
+  function begin() {
+    if (begun) return;
+    begun = true;
+    startedPlaying = true;
+    play();
   }
 
   video = new window.ScrollVideo(canvas, {
     onProgress(p) { loadFrac = Math.min(1, p / video.readyAt); },
-    onReady() { dismissLoader(); }
+    onReady() { begin(); }
   });
   video.load();
-  setTimeout(dismissLoader, 8000);          // safety net: never strand anyone
+  requestAnimationFrame(ringTick);
+  setTimeout(begin, 8000);                  // safety net: never strand anyone
 
   /* ---- playback ------------------------------------------------------
      The clip used to be scrubbed by scroll. It now plays itself once the
@@ -344,6 +343,12 @@
   });
 
   window.addEventListener("resize", render, { passive: true });
+
+  about.addEventListener("click", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.ABOUT && window.StoryModal) window.StoryModal.show(window.ABOUT);
+  });
 
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   render();

@@ -81,7 +81,7 @@ window.NODES = [
  {star:"Vega", w:1, title:"LotusFlare",
   role:"Technical Program Lead", year:"2024\u201325", tags:["Telecom", "Product"],
   href:"https://www.linkedin.com/pulse/khaleesi-his-3-product-managers-thip-bala-gp69e/", cta:"Read: my three dragons", thumb:"assets/img/lotusflare.svg",
-  desc:"What goes into launching a phone company?",
+  desc:"I joined LotusFlare on a whim back in the spring of 2024, off a recommendation from a dear friend from SkyWatch. They were looking for a technical lead to help manage their upcoming projects with T-Mobile. What I didn\u2019t expect was that I would be launching telecom services for celebrities.",
   pts:[
        "Launched Your Name Wireless with T-Mobile \u2014 end to end, in six months.",
        "Built SmartLess Mobile with Jason Bateman and Will Arnett; it landed on Jimmy Kimmel.",
@@ -103,7 +103,7 @@ window.NODES = [
  {star:"Capella", w:1, title:"SkyWatch",
   role:"Strategic Partnerships Lead", year:"2021", tags:["Space", "Partnerships"],
   href:"https://earth.esa.int/eogateway/tools/snap", cta:"Explore SNAP", thumb:"assets/img/skywatch.svg",
-  desc:"Building toolkits with space agencies for anyone who needs space data.",
+  desc:"Back in 2021, finding work was tough. COVID was rampant, and space tech companies were (and still are) pretty scarce here in Canada. I made the life-changing decision to pursue grad school in the UK, but the same week I got my acceptance letter, SkyWatch offered me a job leading their strategic partnership projects. It was a tough decision, but I\u2019m eternally grateful to them for giving me that opportunity\u2014and for trusting me with it.",
   pts:[
        "Led partnership programs with the Canadian and European Space Agencies.",
        "Our engineering shipped into ESA\u2019s open-source SNAP toolbox \u2014 cloud masking, imagery mosaicing.",
@@ -123,7 +123,7 @@ window.NODES = [
  {star:"Antares", w:1, title:"ESSENCE",
   role:"Mission Coordinator", year:"2020", tags:["Space", "Hardware", "CSA"],
   href:"#", thumb:"assets/img/essence.svg",
-  desc:"What went into launching my first CubeSat?",
+  desc:"Back in 2020, I had just finished my undergraduate degree in Space Engineering and had no idea what came next. I was trying to figure out how to turn being a qualified space engineer into something tangible. Thankfully, a couple of graduate students showed me exactly what that could look like when they asked me to help coordinate the launch of the CubeSat we were building with the CSA.",
   pts:[
        "A 3U CubeSat built and flown through the Canadian Space Agency\u2019s CubeSat Project.",
        "Wrote the PRDs, mission and payload requirements, and secured the partners and funding.",
@@ -147,7 +147,7 @@ window.NODES = [
  {star:"Arcturus", w:2, title:"LiveEO",
   role:"Solutions Engineer", year:"2022\u201323", tags:["Geospatial", "ML"],
   href:"https://lnkd.in/p/g5Av3ESv", cta:"Read the write-up", thumb:"assets/img/liveeo.svg",
-  desc:"How we mitigated risk across the world with geospatial data.",
+  desc:"The foundation of LiveEO\u2019s tech stack is actually pretty simple: take the Earth observation data we\u2019re getting from space and turn it into insights that can help mitigate vegetation encroachment, wildfire risk, deforestation exposure, and a whole lot more.",
   pts:[
        "Only technical engineer in North America, running every client across the Americas.",
        "Oversaw solutions across tens of thousands of kilometres of grid, rail and pipeline.",
@@ -169,7 +169,7 @@ window.NODES = [
  {star:"Regulus", w:2, title:"The Knowledge Society",
   role:"Coach", year:"Now", tags:["Education", "Mentorship"],
   href:"https://www.youtube.com/watch?v=k1oO_HHPO5w", cta:"Watch a session", thumb:"assets/img/tks.webp",
-  desc:"An olympics training ground for the world\u2019s youngest innovators.",
+  desc:"The concept of a knowledge society in Ismaili teachings refers to a modern global environment where progress, economic success, and quality of life depend on the acquisition, creation, and application of knowledge rather than physical or material resources. That\u2019s the inspiration behind TKS\u2014the modern take on this idea, where we coach the brightest teenagers across the globe to innovate and become makers now, rather than waiting until they\u2019re adults to start doing something meaningful.",
   pts:[
        "Weekend sessions for 200+ teenagers, September through June.",
        "Partnered with Meta, Microsoft and the UN \u2014 though the mentorship matters more than the logos.",
@@ -190,7 +190,7 @@ window.NODES = [
  {star:"Sirius", w:2, title:"Mammalian Diving Reflex",
   role:"Project Lead", year:"", tags:["Performance art", "Europe"],
   href:"#", thumb:"assets/img/mammalian.svg",
-  desc:"What exactly is social acupuncture?",
+  desc:"When I mention mammalian diving reflex, people usually assume I either worked in biomedical engineering for a bit or got to work closely with marine animals. And I guess, technically, I was working with mammals\u2014more specifically, humans. But this was actually the first time I got to seriously explore performance art. In fact, a lot of who I am today, especially when it comes to creativity and art, comes from the work I got to do here.",
   pts:[
        "Led performance-art projects across Europe, including a month on Unst, the northernmost inhabited island in Shetland.",
        "Haircuts given by ten-year-olds. City tours led by teenagers. Elders talking openly about their sex lives.",
@@ -218,7 +218,7 @@ window.NODES = [
  {star:"Deneb", w:2, title:"Palan Works",
   role:"Creative & Product Lead", year:"2020\u2013", tags:["Writing", "Film"],
   href:"#", thumb:"assets/img/palan.svg",
-  desc:"Turns out I\u2019m a writer as well.",
+  desc:"I still struggle to call myself a writer because it feels egotistical. Everyone is a writer. Everyone is a storyteller. Even writing this feels a little lame. But a close friend once told me that she could feel my personality in my writing, and I\u2019ve always loved that. Whenever she read something I had written, she\u2019d point out the parts where it actually felt like I was talking to her on the page. That always brought a smile to my face.",
   pts:[
        "Films, web series, festival pitches and cultural experiences across North America.",
        "Started in COVID as a way to use the strange amount of free time. It became more than that.",
@@ -239,7 +239,7 @@ window.NODES = [
  {star:"Spica", w:3, title:"String Hoopers",
   role:"Founder", year:"2024", tags:["Non-profit", "Community"],
   href:"#", thumb:"assets/img/stringhoopers.svg",
-  desc:"Can you cook on and off the court?",
+  desc:"A lot of who I am was because of basketball. You can see it in my LinkedIn blurb - \u201cball is life\u201d is the last thing because it\u2019s my foundation. And a lot of that happened in Parkdale for my friends and I. I was raised by this community, and anyone who has met me knows I talk about both Parkdale and basketball very fondly. They almost go hand-in-hand, but things aren\u2019t like that anymore. Teenagers spend their time indoors way more than when I was growing up. Community centres were filled to the brim with activities and programming for everyone. And I wanted to bring that back. So I started a non-profit called String Hoopers back in 2024.",
   pts:[
        "A non-profit summer program built around basketball and food in Parkdale.",
        "Camps spanning sports analytics, media, mental health, cooking and photography.",
@@ -247,7 +247,7 @@ window.NODES = [
        "Basketball and food were the vehicle. The real thing we built was a community."
       ],
   story:[
-   "A lot of who I am was because of basketball. You can see it in my LinkedIn blurb \u2014 \u201cball is life\u201d is the last thing because it\u2019s my foundation. And a lot of that happened in Parkdale for my friends and I. I was raised by this community, and anyone who has met me knows I talk about both Parkdale and basketball very fondly. They almost go hand-in-hand, but things aren\u2019t like that anymore. Teenagers spend their time indoors way more than when I was growing up. Community centres were filled to the brim with activities and programming for everyone. And I wanted to bring that back. So I started a non-profit called String Hoopers back in 2024.",
+   "A lot of who I am was because of basketball. You can see it in my LinkedIn blurb - \u201cball is life\u201d is the last thing because it\u2019s my foundation. And a lot of that happened in Parkdale for my friends and I. I was raised by this community, and anyone who has met me knows I talk about both Parkdale and basketball very fondly. They almost go hand-in-hand, but things aren\u2019t like that anymore. Teenagers spend their time indoors way more than when I was growing up. Community centres were filled to the brim with activities and programming for everyone. And I wanted to bring that back. So I started a non-profit called String Hoopers back in 2024.",
 
    "It\u2019s a play on the phrase String Hopper, which is a traditional Tamil dish made up of rice flour that is pressed into noodles. It also kind of looks like the mesh on a basketball net, and so we built our brand around these two concepts: basketball and food. Parkdale gave us a unique culinary experience with its diversity and intimate palette, and we wanted to bring that back with our summer program.",
 
@@ -256,6 +256,35 @@ window.NODES = [
    "There\u2019s something really powerful about being surrounded by people who share parts of your childhood experience, while also being exposed to completely different perspectives, cultures, and interests. I started this because I missed what Parkdale had given me growing up, but I ended up realizing that what we were really building was a community. Basketball and food were the vehicle; the real goal was giving young people a place to learn, connect, and feel like they belonged."
   ]}
 ];
+
+/* ---------------------------------------------------------------------
+   ABOUT — opened by the button at the top right of the chart. Same shape
+   as a node, so it reuses the write-up modal.
+
+   NOTE: this copy is a DRAFT. It was assembled only from facts already
+   stated in the write-ups above (the degree, the CubeSat, the roles, the
+   weekends) — no biography was invented. Replace it with your own.
+   --------------------------------------------------------------------- */
+window.ABOUT = {
+  star: "about",
+  title: "thip bala",
+  role: "",
+  year: "",
+  tags: ["toronto"],
+  thumb: "assets/img/tks.webp",
+  href: "https://linkedin.com/in/thipeeshanb",
+  cta: "linkedin",
+  desc: "",
+  story: [
+    "I finished a degree in Space Engineering in 2020 and went looking for a way to turn that into something you could point at. The first answer was a 3U CubeSat built with the Canadian Space Agency, which is still in low Earth orbit.",
+
+    "Since then the work has mostly been about taking complicated technology and turning it into something a person can actually use \u2014 Earth observation data at SkyWatch, infrastructure risk at LiveEO, and a phone network at LotusFlare. Somewhere in there I also learned I like the part where engineering, product and clients meet.",
+
+    "The rest of it is less tidy. I coach teenagers at TKS most weekends, I started a non-profit in Parkdale built around basketball and food, and I write \u2014 films, scripts, and apparently very long paragraphs on my own website.",
+
+    "[Replace this with your own words.]"
+  ]
+};
 
 /* Footer links. Anything left as "#" is hidden rather than rendered as a
    dead link — see main.js. Fill one in and it appears. */
