@@ -269,38 +269,6 @@ letterbox behaviour, delete the `placeChart()` calls in `main.js`; the CSS
 fallback already does the right thing, which is also what reduced motion
 gets, since there is no clip to match.
 
-## The greeting
-
-**Currently off.** `SHOW_GREETING` at the top of `main.js` is `false`; flip
-it to `true` to bring it back. Everything it needs is still in place. While
-it is off the `<h1>` stays in the DOM, visually hidden, so the page keeps
-its heading for screen readers.
-
-When on, it is the page's `<h1>`, anchored to the cockpit window
-opening and scales with it, so it reads as painted on the window while the
-camera pushes through.
-
-That anchoring is measured, not eyeballed. `tools/track-window.py` detects
-the dark opening across the frames where it is fully on screen and fits its
-width and centre; the result is `assets/js/window-track.js`. The opening
-grows exponentially at 0.42%/frame (constant-velocity approach to a plane),
-fitting to 1.7% mean error. See `tools/README-tracking.md` to re-derive it.
-
-Both the position and the size are fractions of the **rendered frame**, not
-the viewport, which is what keeps the text welded to the window through the
-canvas `cover` crop at any aspect ratio — including a portrait phone, where
-the frame is cropped hard horizontally.
-
-Size is set as `font-size` rather than `transform: scale()` so the type
-re-rasterises and stays crisp as it grows past 5x. It is derived from the
-type's own measured width, so swapping `--display` for the real chart face
-will not break the fit.
-
-To change the wording, edit the `<h1>` in `index.html`. To change how big it
-sits in the window or when it fades, edit `fill` / `fadeFrom` / `fadeTo` at
-the bottom of `window-track.js` — but note the tracking script rewrites
-those to defaults, so re-apply them after regenerating.
-
 ## Pointer drift
 
 The scene trails the cursor like elastic being pulled: move left and it
@@ -383,15 +351,64 @@ none`), so a stray gesture cannot rewind the intro while you are aiming at a
 star. Change that in the portrait media query in `site.css` if you would
 rather allow it.
 
+## Design system
+
+Typography and palette are carried over from **thip-ins**:
+
+| | |
+|---|---|
+| Display / body | Figtree 400-700 |
+| Technical register | Space Mono 400/700 - star ids, years, pills, tick labels, footer |
+| Background | `#16130f` |
+| Ink | `#f3ecdc` |
+| Accent | `#ff7a3d` |
+| Card / paper | `#211c15` / `#2a241b` |
+
+thip-ins is light by default with a dark variant. A star chart has to be
+dark, so the **dark variant** is the one used here: the same warm
+near-black, cream and orange, in place of the neutral grey and gold this
+started with. Its other signature is hard offset shadows with no blur
+(`4px 6px 0`), which the card and the modal now use, and rounded bordered
+pills for tags.
+
+The one thing deliberately **not** carried across is thip-ins' slight
+rotations (`rotate(-1.2deg)` on its stickers and panels). That belongs to
+its scrapbook layout; tilting a card anchored to a specific star reads as a
+mistake rather than a flourish.
+
+`tools/make-art.py` draws the generated panels from the same tokens, so
+regenerating keeps them in step.
+
+### Matching the clip to the palette
+
+The clip was shot against a neutral near-black (measured `(3,3,3)` on its
+final frame) while the site sits on a warm `(22,19,15)`. Cross-fading
+between those showed the ground lift and warm at the handoff.
+
+`#floor` is a full-bleed layer over the canvas with
+`mix-blend-mode: lighten`, which takes the per-channel maximum: it pins the
+clip's black floor to exactly the page background and leaves anything
+brighter (the cockpit metal, the stars) untouched. Cheaper and far more
+tunable than regrading 1,200 frames, and because it reads `var(--bg)` it
+follows the palette automatically.
+
+## Lower case
+
+The whole site renders lower case via a single `text-transform` on `body`
+in `site.css`. It is done in CSS rather than in the copy so the source text
+keeps its real capitalisation: delete that one line and everything reverts,
+including the long-form writing in the modals.
+
+Form controls carry their own UA `text-transform`, which blocks the
+inherited value, so `button,input,select,textarea{text-transform:inherit}`
+is what keeps the "read more" button in line with the rest.
+
 ## Notes
 
 - `prefers-reduced-motion` skips the approach entirely and opens on the chart.
 - Press `F` to hide the hint, footer, greeting and scroll cue — a clean frame for video capture.
 - Visited nodes persist in `localStorage` under `sc.visited`.
-- Typography is split: **titles** run in Fraunces with its `SOFT` axis at 100
-  (`--display` + `--soft`), everything else — body, metadata, links, footer —
-  runs in a plain system sans (`--meta`), which costs no extra webfont request.
-  This replaces the League Gothic placeholder and departs from design spec §5,
-  which called for a condensed technical grotesque throughout.
-- `assets/js/window-track.js` is **stale**: it was measured against the previous
-  clip. Nothing reads it while the greeting is parked, and the file says so.
+- Typography comes from thip-ins (see **Design system**), which supersedes
+  both the League Gothic placeholder and design spec 5's condensed technical
+  grotesque. Space Mono covers the register that spec was reaching for.
+
