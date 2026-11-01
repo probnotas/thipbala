@@ -119,6 +119,13 @@ data URI for contrast and the two constants for strength. Reduced motion
 opens straight on the chart at `GRAIN_CHART`, and keeps the grain but stops
 it moving.
 
+## Images
+
+`thumb` takes any image. A square portrait in a 16:9 hero loses ~22% of its
+height to the crop, which on a headshot is the head — so a record can set
+`thumbFocus` (a `background-position`) to choose which part survives. The
+about portrait uses `50% 12%`.
+
 ## About me
 
 The filled orange button at the top right of the chart opens
@@ -139,8 +146,8 @@ Everything a person needs to change lives in `assets/js/data.js`:
 `NODES` (the experiences) and `LINKS` (footer). Each node's `star` must
 match a name in `CAT` — that is what positions it on the sky.
 
-Per node: `title`, `desc`, `role`, `year`, `tags`, `pts`
-(bullets), `href` and an optional `cta` to relabel the link. `desc` is a
+Per node: `title`, `desc`, `role`, `year`, `tags`, `story`, `href` and an
+optional `cta` to relabel the link. `desc` is a
 full paragraph — in practice one lifted from `story` — and the card clamps
 it to five lines, with "read more" carrying the rest. The card
 collapses any block you leave empty rather than rendering an empty shell,
@@ -181,8 +188,7 @@ python3 tools/make-art.py      # regenerate all panels
 
 ## The write-up modal
 
-Each card carries the short version — a one-liner and bullets. "Read more"
-opens `#story`, which holds the full prose, the artwork at full width, and
+Each card carries the opening paragraph. "Read more" opens `#story`, which holds the full prose, the artwork at full width, and
 the outbound link. Cards whose node has an empty `story` hide the button.
 
 Prose lives in `story` as one string per paragraph, and supports

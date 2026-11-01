@@ -57,6 +57,9 @@
 
     function fill(n) {
       hero.style.backgroundImage = n.thumb ? `url("${n.thumb}")` : "";
+      // A square portrait in a 16:9 hero loses a fifth of its height to the
+      // crop; thumbFocus says which fifth to give up.
+      hero.style.backgroundPosition = n.thumbFocus || "center";
       hero.classList.toggle("none", !n.thumb);
 
       kicker.textContent = n.star ? n.star.toUpperCase() : "";

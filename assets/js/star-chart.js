@@ -230,6 +230,7 @@
 
       const thumb = card.querySelector(".thumb");
       thumb.style.backgroundImage = n.thumb ? `url("${n.thumb}")` : "";
+      thumb.style.backgroundPosition = n.thumbFocus || "center";
       thumb.classList.toggle("has-img", !!n.thumb);
 
       const meta = card.querySelector(".meta");
@@ -245,15 +246,6 @@
         meta.appendChild(yr);
       }
       meta.hidden = !meta.childElementCount;
-
-      const ul = card.querySelector("ul");
-      ul.textContent = "";
-      (n.pts || []).forEach(p => {
-        const li = document.createElement("li");
-        li.textContent = p;
-        ul.appendChild(li);
-      });
-      ul.hidden = !ul.childElementCount;
 
       // "Read more" opens the full write-up; the outbound link lives in
       // there rather than on the card, so the card has one clear action.

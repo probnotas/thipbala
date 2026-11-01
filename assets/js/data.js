@@ -67,8 +67,7 @@ window.FIGURES = [
    w     : 1 flagship / 2 major / 3 standard — drives node size
    thumb : card/modal artwork. Real photographs where they exist;
            otherwise generated line art (tools/make-art.py).
-   desc  : the one-liner on the card
-   pts   : the card's bullets — the short version
+   desc  : the paragraph shown on the card (clamped to five lines there)
    story : the full write-up, one string per paragraph. Shown in the
            "Read more" modal. Supports [label](url) links, nothing else.
    href  : an outbound link shown at the foot of the modal
@@ -82,12 +81,6 @@ window.NODES = [
   role:"Technical Program Lead", year:"2024\u201325", tags:["Telecom", "Product"],
   href:"https://www.linkedin.com/pulse/khaleesi-his-3-product-managers-thip-bala-gp69e/", cta:"Read: my three dragons", thumb:"assets/img/lotusflare.svg",
   desc:"I joined LotusFlare on a whim back in the spring of 2024, off a recommendation from a dear friend from SkyWatch. They were looking for a technical lead to help manage their upcoming projects with T-Mobile. What I didn\u2019t expect was that I would be launching telecom services for celebrities.",
-  pts:[
-       "Launched Your Name Wireless with T-Mobile \u2014 end to end, in six months.",
-       "Built SmartLess Mobile with Jason Bateman and Will Arnett; it landed on Jimmy Kimmel.",
-       "Now the cheapest and most accessible wireless network in the US.",
-       "Connected BE, FE, QA, product and client teams that had been working in silos."
-      ],
   story:[
    "I joined LotusFlare on a whim back in the spring of 2024, off a recommendation from a dear friend from SkyWatch. They were looking for a technical lead to help manage their upcoming projects with T-Mobile. What I didn\u2019t expect was that I would be launching telecom services for celebrities.",
 
@@ -104,12 +97,6 @@ window.NODES = [
   role:"Strategic Partnerships Lead", year:"2021", tags:["Space", "Partnerships"],
   href:"https://earth.esa.int/eogateway/tools/snap", cta:"Explore SNAP", thumb:"assets/img/skywatch.svg",
   desc:"Back in 2021, finding work was tough. COVID was rampant, and space tech companies were (and still are) pretty scarce here in Canada. I made the life-changing decision to pursue grad school in the UK, but the same week I got my acceptance letter, SkyWatch offered me a job leading their strategic partnership projects. It was a tough decision, but I\u2019m eternally grateful to them for giving me that opportunity\u2014and for trusting me with it.",
-  pts:[
-       "Led partnership programs with the Canadian and European Space Agencies.",
-       "Our engineering shipped into ESA\u2019s open-source SNAP toolbox \u2014 cloud masking, imagery mosaicing.",
-       "Ran multi-year Agile programs across EarthCache and TerraStream.",
-       "Got Scrum certified somewhere in the middle of it."
-      ],
   story:[
    "Back in 2021, finding work was tough. COVID was rampant, and space tech companies were (and still are) pretty scarce here in Canada. I made the life-changing decision to pursue grad school in the UK, but the same week I got my acceptance letter, SkyWatch offered me a job leading their strategic partnership projects. It was a tough decision, but I\u2019m eternally grateful to them for giving me that opportunity\u2014and for trusting me with it.",
 
@@ -124,12 +111,6 @@ window.NODES = [
   role:"Mission Coordinator", year:"2020", tags:["Space", "Hardware", "CSA"],
   href:"#", thumb:"assets/img/essence.svg",
   desc:"Back in 2020, I had just finished my undergraduate degree in Space Engineering and had no idea what came next. I was trying to figure out how to turn being a qualified space engineer into something tangible. Thankfully, a couple of graduate students showed me exactly what that could look like when they asked me to help coordinate the launch of the CubeSat we were building with the CSA.",
-  pts:[
-       "A 3U CubeSat built and flown through the Canadian Space Agency\u2019s CubeSat Project.",
-       "Wrote the PRDs, mission and payload requirements, and secured the partners and funding.",
-       "Carried an Arctic permafrost camera and a proton detector built with the University of Sydney.",
-       "Still drifting around in low Earth orbit. I call it my first because it won\u2019t be my last."
-      ],
   story:[
    "Back in 2020, I had just finished my undergraduate degree in Space Engineering and had no idea what came next. I was trying to figure out how to turn being a qualified space engineer into something tangible. Thankfully, a couple of graduate students showed me exactly what that could look like when they asked me to help coordinate the launch of the CubeSat we were building with the CSA.",
 
@@ -148,12 +129,6 @@ window.NODES = [
   role:"Solutions Engineer", year:"2022\u201323", tags:["Geospatial", "ML"],
   href:"https://lnkd.in/p/g5Av3ESv", cta:"Read the write-up", thumb:"assets/img/liveeo.svg",
   desc:"The foundation of LiveEO\u2019s tech stack is actually pretty simple: take the Earth observation data we\u2019re getting from space and turn it into insights that can help mitigate vegetation encroachment, wildfire risk, deforestation exposure, and a whole lot more.",
-  pts:[
-       "Only technical engineer in North America, running every client across the Americas.",
-       "Oversaw solutions across tens of thousands of kilometres of grid, rail and pipeline.",
-       "Satellite imagery turned into vegetation, wildfire and deforestation risk.",
-       "Project Lead \u2192 Solutions Engineer \u2192 Enterprise Account Executive."
-      ],
   story:[
    "My German is now awful, but when I was living in Berlin back in Fall 2022, it was schrecklich. That means terrible in German, but slightly less than awful.",
 
@@ -170,11 +145,6 @@ window.NODES = [
   role:"Coach", year:"Now", tags:["Education", "Mentorship"],
   href:"https://www.youtube.com/watch?v=k1oO_HHPO5w", cta:"Watch a session", thumb:"assets/img/tks.webp",
   desc:"The concept of a knowledge society in Ismaili teachings refers to a modern global environment where progress, economic success, and quality of life depend on the acquisition, creation, and application of knowledge rather than physical or material resources. That\u2019s the inspiration behind TKS\u2014the modern take on this idea, where we coach the brightest teenagers across the globe to innovate and become makers now, rather than waiting until they\u2019re adults to start doing something meaningful.",
-  pts:[
-       "Weekend sessions for 200+ teenagers, September through June.",
-       "Partnered with Meta, Microsoft and the UN \u2014 though the mentorship matters more than the logos.",
-       "Watching a 15-year-old go from \u201cI have no idea what I\u2019m doing\u201d to funded is the whole job."
-      ],
   story:[
    "The concept of a knowledge society in Ismaili teachings refers to a modern global environment where progress, economic success, and quality of life depend on the acquisition, creation, and application of knowledge rather than physical or material resources. That\u2019s the inspiration behind TKS\u2014the modern take on this idea, where we coach the brightest teenagers across the globe to innovate and become makers now, rather than waiting until they\u2019re adults to start doing something meaningful.",
 
@@ -191,12 +161,6 @@ window.NODES = [
   role:"Project Lead", year:"", tags:["Performance art", "Europe"],
   href:"#", thumb:"assets/img/mammalian.svg",
   desc:"When I mention mammalian diving reflex, people usually assume I either worked in biomedical engineering for a bit or got to work closely with marine animals. And I guess, technically, I was working with mammals\u2014more specifically, humans. But this was actually the first time I got to seriously explore performance art. In fact, a lot of who I am today, especially when it comes to creativity and art, comes from the work I got to do here.",
-  pts:[
-       "Led performance-art projects across Europe, including a month on Unst, the northernmost inhabited island in Shetland.",
-       "Haircuts given by ten-year-olds. City tours led by teenagers. Elders talking openly about their sex lives.",
-       "Discomfort engineered on purpose, to hand people back a new kind of comfort.",
-       "Half of my project management actually came from here, not from engineering."
-      ],
   story:[
    "When I mention mammalian diving reflex, people usually assume I either worked in biomedical engineering for a bit or got to work closely with marine animals. And I guess, technically, I was working with mammals\u2014more specifically, humans. But this was actually the first time I got to seriously explore performance art. In fact, a lot of who I am today, especially when it comes to creativity and art, comes from the work I got to do here.",
 
@@ -219,11 +183,6 @@ window.NODES = [
   role:"Creative & Product Lead", year:"2020\u2013", tags:["Writing", "Film"],
   href:"#", thumb:"assets/img/palan.svg",
   desc:"I still struggle to call myself a writer because it feels egotistical. Everyone is a writer. Everyone is a storyteller. Even writing this feels a little lame. But a close friend once told me that she could feel my personality in my writing, and I\u2019ve always loved that. Whenever she read something I had written, she\u2019d point out the parts where it actually felt like I was talking to her on the page. That always brought a smile to my face.",
-  pts:[
-       "Films, web series, festival pitches and cultural experiences across North America.",
-       "Started in COVID as a way to use the strange amount of free time. It became more than that.",
-       "Scripts, campaigns, and the occasional weird idea that turns into something real."
-      ],
   story:[
    "I still struggle to call myself a writer because it feels egotistical. Everyone is a writer. Everyone is a storyteller. Even writing this feels a little lame. But a close friend once told me that she could feel my personality in my writing, and I\u2019ve always loved that. Whenever she read something I had written, she\u2019d point out the parts where it actually felt like I was talking to her on the page. That always brought a smile to my face.",
 
@@ -240,12 +199,6 @@ window.NODES = [
   role:"Founder", year:"2024", tags:["Non-profit", "Community"],
   href:"#", thumb:"assets/img/stringhoopers.svg",
   desc:"A lot of who I am was because of basketball. You can see it in my LinkedIn blurb - \u201cball is life\u201d is the last thing because it\u2019s my foundation. And a lot of that happened in Parkdale for my friends and I. I was raised by this community, and anyone who has met me knows I talk about both Parkdale and basketball very fondly. They almost go hand-in-hand, but things aren\u2019t like that anymore. Teenagers spend their time indoors way more than when I was growing up. Community centres were filled to the brim with activities and programming for everyone. And I wanted to bring that back. So I started a non-profit called String Hoopers back in 2024.",
-  pts:[
-       "A non-profit summer program built around basketball and food in Parkdale.",
-       "Camps spanning sports analytics, media, mental health, cooking and photography.",
-       "Named for the Tamil dish \u2014 a string hopper looks like the mesh on a basketball net.",
-       "Basketball and food were the vehicle. The real thing we built was a community."
-      ],
   story:[
    "A lot of who I am was because of basketball. You can see it in my LinkedIn blurb - \u201cball is life\u201d is the last thing because it\u2019s my foundation. And a lot of that happened in Parkdale for my friends and I. I was raised by this community, and anyone who has met me knows I talk about both Parkdale and basketball very fondly. They almost go hand-in-hand, but things aren\u2019t like that anymore. Teenagers spend their time indoors way more than when I was growing up. Community centres were filled to the brim with activities and programming for everyone. And I wanted to bring that back. So I started a non-profit called String Hoopers back in 2024.",
 
@@ -271,7 +224,10 @@ window.ABOUT = {
   role: "",
   year: "",
   tags: ["toronto"],
-  thumb: "assets/img/tks.webp",
+  thumb: "assets/img/thip.jpg",
+  // A square portrait in a 16:9 hero: a centre crop would take the top
+  // 22% of the frame, which is his head. Bias the crop upward instead.
+  thumbFocus: "50% 12%",
   href: "https://linkedin.com/in/thipeeshanb",
   cta: "linkedin",
   desc: "",
