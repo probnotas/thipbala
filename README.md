@@ -121,30 +121,45 @@ it moving.
 
 ## Images
 
-`thumb` takes any image. The hero defaults to 16:9, which suits the wide
-line-art panels but shows only **56%** of a square portrait's height —
-enough for a face, not for a head and shoulders. Two optional fields fix
-that per record:
+Every entry has a real image in `assets/img/`, except cont'd, which gets
+the one generated panel (`tools/make-art.py`). SkyWatch is a live capture of
+skywatch.com/explore cropped above its cookie banner; thip-ins is a capture
+of the thip-ins site itself.
 
-- `thumbRatio` — the hero's shape. The about portrait uses `4 / 3`, which
-  shows 75% of the square.
-- `thumbFocus` — a `background-position` saying which part of the crop to
-  keep. The portrait uses `50% 0%`, anchoring to the top so none of the
-  hair is lost.
+The hero defaults to 16:9 with `cover`. Three per-record overrides handle
+images that don't suit that:
+
+- `thumbRatio` — the shape. LiveEO's banner is 4:1, so it uses `4 / 1` and
+  shows whole; the about portrait uses `4 / 3`.
+- `thumbFit: "contain"` — show the whole image on paper rather than crop.
+  Used for the CubeSat photo (only 327px wide; cropping and upscaling it
+  went soft) and the String Hoopers poster (portrait format; a 16:9 band
+  cut the title off).
+- `thumbFocus` — a `background-position` choosing what a crop keeps.
+
+All three apply to both the card and the modal.
 
 ## About me
 
-The filled orange button at the top right of the chart opens
-`window.ABOUT` from `data.js` through the same write-up modal the nodes
-use — it is just a node-shaped record, so it takes the same fields.
+The filled orange button at the top right opens `window.ABOUT` through the
+write-up modal, which has an about-only mode:
 
-It is the only filled control on the page, which is what makes it read as
-the thing to press on a chart made of thin line work.
+- **A photo collage** (`photos`) in place of the single hero — taped
+  polaroids, tilted, hard shadows, dropping in one at a time. This is
+  thip-ins' scrapbook language. It is deliberately kept off the chart,
+  where a tilted card beside a precise star reads as a bug, but on a page
+  about a person the mess is the point. Up to six photos; the first is
+  largest. Slots are spaced so a lower photo always starts below the
+  caption of anything above it — overlapping photos is the look, burying
+  captions is not. On phones the collage becomes a tilted two-column grid.
+- **A pull quote** (`quote`), **the story**, a **"right now" list**
+  (`now`, supports links) and **link buttons** (`links`).
 
-**Its copy is a draft.** It was assembled only from facts already stated in
-the write-ups (the degree, the CubeSat, the roles, the weekends) — no
-biography was invented — and the last paragraph says so in the text.
-Replace it.
+Every sentence of the story is Thip's own, lifted from the write-ups — none
+of his voice was invented.
+
+**Only the first photo is actually of him.** The other four are stand-ins
+from his projects until real photos of him are added.
 
 ## Editing content
 

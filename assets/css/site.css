@@ -321,6 +321,7 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
   border:1px solid var(--card-line);
   box-shadow:5px 7px 0 var(--shadow);
   overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:rgba(243,236,220,.25) transparent;
   opacity:0;transform:translateY(14px) scale(.985);
   transition:opacity .28s ease,transform .28s cubic-bezier(.22,.61,.36,1);
 }
@@ -394,9 +395,110 @@ svg#chart{width:100%;height:100%;flex:none;display:block;touch-action:manipulati
 }
 .story-link:hover{border-bottom-color:var(--accent)}
 
+/* =====================================================================
+   About collage. This is where thip-ins' scrapbook language finally gets
+   to be itself: taped polaroids, tilted, hard shadows. It is kept off
+   the chart, where a tilted card beside a precise star reads as a bug —
+   but on a page about a person, the mess is the point.
+   ===================================================================== */
+.story-collage{
+  position:relative;flex:none;
+  aspect-ratio:720/560;
+  margin:22px 18px 4px;
+}
+.polaroid{
+  position:absolute;margin:0;
+  padding:7px 7px 0;
+  background:#f3ecdc;
+  box-shadow:3px 5px 0 rgba(0,0,0,.55);
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .22s cubic-bezier(.2,.9,.3,1.2),box-shadow .22s ease;
+  z-index:1;
+  /* each one drops in on its own beat when the page opens */
+  animation:pinUp .55s cubic-bezier(.2,.9,.3,1.2) both;
+  animation-delay:calc(.08s + var(--i,0) * .07s);
+}
+/* the tape */
+.polaroid::before{
+  content:"";position:absolute;left:50%;top:-9px;
+  width:42%;height:17px;margin-left:-21%;
+  background:rgba(238,224,172,.82);
+  transform:rotate(calc(var(--tilt,0deg) * -1.4));
+  box-shadow:0 1px 0 rgba(90,70,30,.25);
+}
+.polaroid img{
+  display:block;width:100%;aspect-ratio:1/1;
+  object-fit:cover;background:#2a241b;
+}
+.polaroid figcaption{
+  font-family:var(--mono);font-size:10.5px;line-height:1.3;
+  color:#2a241b;text-align:center;
+  padding:7px 4px 9px;
+}
+.polaroid:hover{
+  transform:rotate(0deg) scale(1.06) translateY(-4px);
+  box-shadow:5px 9px 0 rgba(0,0,0,.5);
+  z-index:5;
+}
+@keyframes pinUp{
+  from{opacity:0;transform:translateY(18px) rotate(calc(var(--tilt,0deg) * 3)) scale(.94)}
+  to  {opacity:1;transform:rotate(var(--tilt,0deg))}
+}
+
+.story-quote{
+  margin:4px 0 22px;padding:0 0 0 16px;
+  border-left:3px solid var(--accent);
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(24px,3.6vw,32px);line-height:1.12;letter-spacing:-.03em;
+  color:var(--star);
+}
+
+.story-now{
+  margin:26px 0 0;padding:16px 18px 6px;
+  background:var(--paper);
+  border:1.5px dashed var(--card-line);
+}
+.story-now-h{
+  margin:0 0 10px;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--accent);
+}
+.story-now ul{margin:0;padding:0;list-style:none}
+.story-now li{
+  position:relative;padding:0 0 10px 18px;
+  font-size:14px;line-height:1.5;color:rgba(243,236,220,.85);
+}
+.story-now a{color:var(--accent);text-decoration:none;border-bottom:1.5px solid rgba(255,122,61,.45)}
+.story-now a:hover{border-bottom-color:var(--accent)}
+.story-now li::before{
+  content:"";position:absolute;left:2px;top:.55em;
+  width:7px;height:7px;border-radius:50%;background:var(--accent);
+}
+
+.story-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.story-links a{
+  display:inline-flex;align-items:center;min-height:36px;padding:0 15px;
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  color:#16130f;background:var(--accent);text-decoration:none;
+  border-radius:999px;box-shadow:3px 4px 0 var(--shadow);
+  transition:transform .14s ease,box-shadow .14s ease;
+}
+.story-links a:hover{transform:translate(1px,1px);box-shadow:2px 3px 0 var(--shadow)}
+
+@media (max-width:720px){
+  /* two loose columns on a phone — still tilted, no longer stacked */
+  .story-collage{
+    aspect-ratio:auto;margin:22px 14px 0;
+    display:grid;grid-template-columns:1fr 1fr;gap:18px 14px;
+  }
+  .polaroid{position:relative;left:auto!important;top:auto!important;width:auto!important}
+  .polaroid:first-child{grid-column:1 / -1;width:72%!important;justify-self:center}
+}
+
 @media (prefers-reduced-motion:reduce){
   .story-scrim,.story-panel{transition:none}
   .story-panel{transform:none}
+  .polaroid{animation:none;transition:none}
 }
 
 /* ---- footer + hint ---- */

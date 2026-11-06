@@ -231,6 +231,11 @@
       const thumb = card.querySelector(".thumb");
       thumb.style.backgroundImage = n.thumb ? `url("${n.thumb}")` : "";
       thumb.style.backgroundPosition = n.thumbFocus || "center";
+      // Same per-record overrides as the modal: a 4:1 banner wants its own
+      // shape, and a small photo or a portrait poster reads better whole
+      // on paper than cropped into a 16:9 band.
+      thumb.style.backgroundSize = n.thumbFit === "contain" ? "contain" : "cover";
+      thumb.style.aspectRatio = n.thumbRatio || "";
       thumb.classList.toggle("has-img", !!n.thumb);
 
       const meta = card.querySelector(".meta");

@@ -40,6 +40,13 @@
     return p;
   }
 
+  /* Move every child across. Not childNodes.forEach(appendChild): that
+     iterates a LIVE list while emptying it, so it skips every other node —
+     a list item with a link mid-sentence would silently lose pieces. */
+  function moveChildren(from, to) {
+    while (from.firstChild) to.appendChild(from.firstChild);
+  }
+
   function Story() {
     const root   = document.getElementById("story");
     if (!root) return null;
@@ -50,6 +57,57 @@
     const meta   = root.querySelector(".story-meta");
     const prose  = root.querySelector(".story-prose");
     const link   = root.querySelector(".story-link");
+    const collage = root.querySelector(".story-collage");
+    const quote  = root.querySelector(".story-quote");
+    const now    = root.querySelector(".story-now");
+    const links  = root.querySelector(".story-links");
+
+    /* Where each polaroid lands, as % of the collage box: [left, top,
+       width, tilt]. Two loose rows with the first slot largest, so the
+       portrait leads. A record with fewer photos uses the first N.
+
+       Photos may overlap — that is the scrapbook — but a lower photo must
+       start below the CAPTION of anything above it, or the caption is the
+       part that gets buried. The rows are spaced for that, which is why
+       the box is 720:560 rather than something flatter. */
+    const SLOTS = [
+      [ 2,  4, 34, -5  ],
+      [36,  0, 27,  3  ],
+      [64,  6, 30, -2.5],
+      [14, 53, 28,  4  ],
+      [48, 51, 29, -3  ],
+      [77, 56, 21,  5  ]
+    ];
+
+    function renderCollage(photos) {
+      collage.textContent = "";
+      photos.slice(0, SLOTS.length).forEach((ph, i) => {
+        const [l, t, w, r] = SLOTS[i];
+        const fig = document.createElement("figure");
+        fig.className = "polaroid";
+        fig.style.left = l + "%";
+        fig.style.top = t + "%";
+        fig.style.width = w + "%";
+        fig.style.setProperty("--tilt", r + "deg");
+        fig.style.setProperty("--i", i);
+
+        const img = document.createElement("img");
+        img.src = ph.src;
+        img.alt = ph.caption || "";
+        img.loading = "lazy";
+        img.decoding = "async";
+        if (ph.pos) img.style.objectPosition = ph.pos;
+        fig.appendChild(img);
+
+        if (ph.caption) {
+          const cap = document.createElement("figcaption");
+          cap.textContent = ph.caption;
+          fig.appendChild(cap);
+        }
+        collage.appendChild(fig);
+      });
+      collage.hidden = !photos.length;
+    }
     const closeBtn = root.querySelector(".story-close");
 
     let lastFocus = null;
@@ -63,7 +121,14 @@
          part of the crop to keep. */
       hero.style.aspectRatio = n.thumbRatio || "";
       hero.style.backgroundPosition = n.thumbFocus || "center";
-      hero.classList.toggle("none", !n.thumb);
+      hero.style.backgroundSize = n.thumbFit === "contain" ? "contain" : "cover";
+      // A record with photos gets the collage in place of a single hero.
+      const photos = n.photos || [];
+      hero.classList.toggle("none", !n.thumb || photos.length > 0);
+      renderCollage(photos);
+
+      quote.textContent = n.quote || "";
+      quote.hidden = !n.quote;
 
       kicker.textContent = n.star ? n.star.toUpperCase() : "";
       title.textContent = n.title || "";
@@ -91,7 +156,7 @@
         if (t.startsWith("- ")) {
           if (!list) { list = document.createElement("ul"); prose.appendChild(list); }
           const li = document.createElement("li");
-          renderParagraph(t.slice(2)).childNodes.forEach(node => li.appendChild(node));
+          moveChildren(renderParagraph(t.slice(2)), li);
           list.appendChild(li);
         } else {
           list = null;
@@ -99,9 +164,30 @@
         }
       });
 
+      const nowList = now.querySelector("ul");
+      nowList.textContent = "";
+      (n.now || []).forEach(t => {
+        const li = document.createElement("li");
+        moveChildren(renderParagraph(t), li);
+        nowList.appendChild(li);
+      });
+      now.hidden = !nowList.childElementCount;
+
+      links.textContent = "";
+      (n.links || []).forEach(l => {
+        const href = safeHref(l.href);
+        if (!href) return;
+        const a = document.createElement("a");
+        a.href = href;
+        a.textContent = l.label;
+        if (/^https?:/i.test(href)) { a.target = "_blank"; a.rel = "noopener noreferrer"; }
+        links.appendChild(a);
+      });
+      links.hidden = !links.childElementCount;
+
       const href = n.href || "#";
       const external = /^https?:/i.test(href);
-      link.hidden = !external;
+      link.hidden = !external || links.childElementCount > 0;
       if (external) {
         link.href = href;
         link.textContent = n.cta || "Learn more";
